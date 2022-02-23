@@ -12,6 +12,10 @@ fetch('navbar.html')
 })
 
 // make current page link active in navbar
-$(function() {
+/* $(function() {
     $('nav a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
   });
+ */
+  window.onload = function(e){ 
+    console.log("window.onload"); 
+}
