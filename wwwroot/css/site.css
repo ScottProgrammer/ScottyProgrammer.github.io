@@ -6,6 +6,10 @@ body {
     margin: 0px;
 }
 
+.main {
+  margin:10px;
+}
+
 /* Add a black background color to the top navigation */
 .topnav {
     overflow: hidden;
