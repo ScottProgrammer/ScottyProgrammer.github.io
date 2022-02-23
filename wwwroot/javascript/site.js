@@ -1,4 +1,4 @@
-fetch('navbar.html')
+/* fetch('navbar.html')
 .then(res => res.text())
 .then(text => {
     // replace navbar div with navbar on page
@@ -12,10 +12,13 @@ fetch('navbar.html')
 })
 
 // make current page link active in navbar
-/* $(function() {
-    $('nav a[href^="/' + location.pathname.split("/")[1] + '"]').addClass('active');
-  });
- */
   window.onload = function(e){ 
     console.log("window.onload"); 
-}
+    console.log(window.location.href);
+
+    var nav = document.getElementsByClassName('topnav');
+    if (nav != null)
+    {
+        nav.
+    }
+} */
