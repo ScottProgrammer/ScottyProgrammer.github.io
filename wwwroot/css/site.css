@@ -1,5 +1,7 @@
-h1 {
+.title {
     color:white;
+    margin-bottom: 0px;
+    margin-top:15px;
 }
 
 body {
@@ -7,7 +9,7 @@ body {
 }
 
 .main {
-  margin:30px;
+  margin: 15px 30px;
 }
 
 /* Add a black background color to the top navigation */
