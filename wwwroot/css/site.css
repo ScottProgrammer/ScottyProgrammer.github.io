@@ -12,6 +12,10 @@ body {
   margin: 15px 30px;
 }
 
+label.line {
+  display:block;
+}
+
 /* Add a black background color to the top navigation */
 .topnav {
     overflow: hidden;
@@ -40,3 +44,6 @@ body {
     color: white;
   }
 
+  .clearfix {
+    overflow: auto;
+  }
