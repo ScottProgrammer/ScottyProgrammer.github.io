@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/ico" href="favicon.ico"/>
@@ -10,8 +12,6 @@
 </head>
 <body>
     <!--Navigation bar-->
-    <!-- <script id="replace_with_navbar" src="wwwroot/javascript/site.js"></script> -->
-
     <div class="clearfix" style="display:block; background-color: #333; overflow:hidden;">
         <div style="margin:0px 80px 0px 10px; float:left;">
             <div style="display:flex;">
@@ -22,24 +22,31 @@
         <div class="topnav" style="float:left;">
             <a href="./">Home</a>
             <a class="active" href="projects.html">Projects</a>
-            <a href="#Info">Info</a>
+            <a href="info.html">Info</a>
             <a href="about.html">About</a>
         </div>
     </div>
 
-    <div class="main"> <!-- style="background-image:url('wwwroot/images/background.png');"> -->
+    <div class="main"> 
         <h2 style="margin-bottom:15px;">Projects</h2>
         <h3 style="margin-bottom:5px; margin-top:5px;">Chess Table</h3>
-        <div>
-            <img srcset="wwwroot/images/ChessTable_300.png 260w, wwwroot/images/ChessTable_300.png 680w"
-            sizes="(max-width: 720px) 500px, 680px" 
-            src="wwwroot/images/ChessTable_300.png" alt="Chess table"
-            style="margin-right:15px; float:left;" />
-            <div class="clearfix" style="min-width:100px;">
-                <p>A light up motorized chess table that links to the computer to allow playing against the stockfish chess engine.</p>
-                <p>We are currently working on this and will post in multiple parts as we progress.</p>
-            </div>
-        </div>
+
+        <ul>
+            <li>
+                <div class="clearfix" style="padding:5px;">
+                    <a href="projects/chesstable.html">
+                        <img srcset="wwwroot/images/ChessTable_300.png 260w, wwwroot/images/ChessTable_300.png 680w"
+                        sizes="(max-width: 720px) 500px, 680px" 
+                        src="wwwroot/images/ChessTable_300.png" alt="Chess table"
+                        style="margin-right:15px; float:left;" />
+                        <div class="clearfix" style="min-width:100px;">
+                            <p>A light up motorized chess table that links to the computer to allow playing against the stockfish chess engine.</p>
+                            <p>We are currently working on this and will post in multiple parts as we progress.</p>
+                        </div>
+                    </a>
+                </div>
+            </li>
+        </ul>
     </div>
 </body>
 </html>
