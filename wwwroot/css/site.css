@@ -40,7 +40,7 @@ label.line {
   
   /* Add a color to the active/current link */
   .topnav a.active {
-    background-color: #04AA6D;
+    background-color: #758918;
     color: white;
   }
 
@@ -50,25 +50,26 @@ label.line {
 
   ul {
     padding-left:0px;
+    margin-top:5px;
   }
 
   li {
     list-style-type: none;
   }
 
-  li:hover {
+  /* li:hover {
     background-color: aquamarine;
-  }
+  } */
 
   button.back {
-    background-color:#04AA6D;
+    background-color:#758918;
     color: white;
     border: 1px solid transparent;
     border-radius: 3px;
   }
 
   button.back:hover {
-    background-color:#18a689
+    background-color:#5b6b12;
   }
 
    /* Style the button that is used to open and close the collapsible content */
