@@ -72,7 +72,7 @@ function touchMove(e){
           window.location.href = "projects.html"
           break;
         case "projects":
-          window.location.href = "home.html"
+          window.location.href = "./"
           break;
       }
     }
