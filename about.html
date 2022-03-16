@@ -29,7 +29,8 @@
             </div>
         </div>
 
-         <div class="main"> 
+         <div class="main" ontouchstart="touchStart(event, 'about')" ontouchmove="touchMove(event)" ontouchend="touchEnd()" >
+
             <h2 style="margin-bottom:15px;">About</h2>
             <div style="float:right">
                 <img src="wwwroot/images/logo_192.png" width="96" height="96" />
@@ -46,6 +47,9 @@
             src="wwwroot/images/working_260.webp" alt="Built Clever workshop"
             style="margin-top:15px;" />
             <p style="margin-top:0px; font-weight:bold;"><small>Our workshop in the garage.</small></p>
+
         </div>
+
+        <script src="wwwroot/javascript/site.js"></script>
     </body>
 </html>
