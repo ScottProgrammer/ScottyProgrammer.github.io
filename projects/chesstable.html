@@ -36,29 +36,52 @@
             <h2 style="margin-left:15px; margin-bottom:15px;">Chess table</h2>
         </div>
         
-        <div class="clearfix cardbody" >
+        <div class="clearfix" >
             <img srcset="../wwwroot/images/ChessTable_300x200.webp 260w, ../wwwroot/images/ChessTable_300x200.webp 680w"
                         sizes="(max-width: 720px) 500px, 680px" 
                         src="../wwwroot/images/ChessTable_300x200.webp" alt="Chess table"
-                        style="margin-right:15px; float:left;" />
+                        style="margin-right:15px; float:right;" />
             <div class="clearfix" style="min-width:100px;">
-                <p>A light up motorized chess table that links to the computer to allow playing against the stockfish chess engine.</p>
+                <p>If only you could play computer chess with all its cool functionality on a chess board in the real world with real chess pieces.</p>
+
                 <p style="margin-bottom:8px;color:#9E9A41;">We are currently working on this and will post in multiple parts as we progress.</p>
                 <span style="color:#758918;">Part 1 coming soon!!!</span>
+
+                <p>In this project we build a light up motorized chess table that links to the computer.</p>
+                
+                <p>are goals are</p>
+                <ul>
+                    <li>Allow playing against a computer AI</li>
+                    <li>Allow playing with two people</li>
+                    <li>Light up the squares to show valid moves, checks, etc</li>
+                    <li>Automatically do the computers moves by moving its chess pieces using motors and magnets</li>
+                </ul>
+
+                <p>I am in the process of coding my own chess game. To allow playing chess on the computer against the open source stockfish chess engine with the option to control our chess table.</p>
             </div>
         </div>
 
         
 
-        <div style="margin-top:15px;">
-            <button type="button" class="collapsible">Chess AI - Stockfish chess engine</button>
-            <div class="content">
+        <div style="margin-top:10px;">
+            <button type="button" class="collapsible">Computer Chess AI - Stockfish chess engine</button>
+            <div class="collapsiblebody">
                 <p>Stockfish is a free and open-source chess engine</p>
                 <p>Stockfish is consistently ranked first or near the top of most chess-engine rating lists and is the strongest CPU chess engine in the world.</p>
                 website: <a href="https://stockfishchess.org/">stockfishchess.org</a>
                 <div style="margin-bottom:15px;"></div>
             </div>
+        </div>
 
+        <div style="margin-top:10px;">
+            <button type="button" class="collapsible">Technologies</button>
+            <div class="collapsiblebody">
+                <p>Visual Studio: Coding the chess program</p>
+                <p>Arduino: Control the stepper motors, light up the chess squares, and read chess moves</p>
+                <p>Bluetooth: Communicate between the computer and chess table</p>
+                <p>3D Printing: Parts to hook up motors and movement to the chess table, the Chess squares to allow the lighting we want, chess pieces</p>
+                <div style="margin-bottom:15px;"></div>
+            </div>
         </div>
 
     </div>

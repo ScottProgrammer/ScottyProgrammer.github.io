@@ -20,19 +20,6 @@ label.line {
     overflow: auto;
   }
 
-  ul {
-    padding-left:0px;
-    margin-top:5px;
-  }
-
-  li {
-    list-style-type: none;
-  }
-
-  /* li:hover {
-    background-color: aquamarine;
-  } */
-
   button.back {
     background-color:#758918;
     color: white;
@@ -104,7 +91,7 @@ label.line {
   background-color: #eee;
   color: #444;
   cursor: pointer;
-  padding: 18px;
+  padding: 10px;
   width: 100%;
   border: none;
   text-align: left;
@@ -118,7 +105,7 @@ label.line {
 }
 
 /* Style the collapsible content. Note: hidden by default */
-.content {
+.collapsiblebody {
   padding: 0 18px;
   max-height: 0;
   overflow: hidden;
@@ -126,7 +113,7 @@ label.line {
   background-color: #f1f1f1;
 }
 
-.collapsible:after {
+.collapsible:before {
   content: '\02795'; /* Unicode character for "plus" sign (+) */
   font-size: 13px;
   color: white;
@@ -134,7 +121,7 @@ label.line {
   margin-left: 5px;
 }
 
-.collapsible.active:after {
+.collapsible.active:before {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 /* #endregion */
