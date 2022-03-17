@@ -44,7 +44,7 @@ function touchMove(e){
   
   if (e.touches[0].clientY < c_intTouchStartY + 50 && e.touches[0].clientY > c_intTouchStartY - 50) // when scrolling up down don't accidently swap pages
   {
-    if (e.touches[0].clientX < c_intTouchStartX - 150)
+    if (e.touches[0].clientX < c_intTouchStartX - 100)
     {
       //console.log("swipe right");
       switch (c_strPage)
@@ -60,7 +60,7 @@ function touchMove(e){
           break;
       }
     }
-    else if (e.touches[0].clientX > c_intTouchStartX + 150)
+    else if (e.touches[0].clientX > c_intTouchStartX + 100)
     {
         //console.log("swipe left");
         switch (c_strPage)

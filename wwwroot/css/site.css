@@ -9,40 +9,12 @@ body {
 }
 
 .main {
-  margin: 15px 30px;
+  margin: 15px;
 }
 
 label.line {
   display:block;
 }
-
-/* Add a black background color to the top navigation */
-.topnav {
-    overflow: hidden;
-  }
-  
-  /* Style the links inside the navigation bar */
-  .topnav a {
-    margin-top:15px;
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-  }
-  
-  /* Change the color of links on hover */
-  .topnav a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-  
-  /* Add a color to the active/current link */
-  .topnav a.active {
-    background-color: #758918;
-    color: white;
-  }
 
   .clearfix {
     overflow: auto;
@@ -72,6 +44,61 @@ label.line {
     background-color:#5b6b12;
   }
 
+/* #region "cards" */
+.card {
+    border:1px solid #5A3D34;
+    border-radius:5px 5px 3px 3px;
+    display:inline-block;
+}
+.cardtitle {
+    border-bottom: 1px solid #5A3D34;
+    background-color: #D4BC9C;
+    padding:5px 10px;
+    border-radius:5px 5px 0px 0px;
+}
+
+.cardtitle h3 {
+    margin-bottom:2px;
+    margin-top:2px;
+    color:#31261E;
+}
+
+.cardbody {
+  padding:10px;
+}
+/* #endregion */
+
+  /* #region "Navbar" */
+/* Add a background color to the top navigation */
+.topnav {
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  margin-top:15px;
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #758918;
+  color: white;
+}
+/* #endregion  */
+
+  /* #region "Collapsible" */
    /* Style the button that is used to open and close the collapsible content */
 .collapsible {
   background-color: #eee;
@@ -110,3 +137,4 @@ label.line {
 .collapsible.active:after {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
+/* #endregion */
