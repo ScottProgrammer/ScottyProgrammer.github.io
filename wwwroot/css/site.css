@@ -20,15 +20,26 @@ label.line {
     overflow: auto;
   }
 
-  button.back {
+  button.green {
     background-color:#758918;
     color: white;
     border: 1px solid transparent;
     border-radius: 3px;
   }
 
-  button.back:hover {
+  button.green:hover {
     background-color:#5b6b12;
+  }
+
+  button.brown {
+    background-color:#5A3D34;
+    color: white;
+    border: 1px solid transparent;
+    border-radius: 3px;
+  }
+
+  button.brown:hover {
+    background-color:#4d362f;
   }
 
 /* #region "cards" */
