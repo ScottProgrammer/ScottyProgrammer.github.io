@@ -57,7 +57,7 @@
             
             <!-- Chess Table -->
             <div class="clearfix" >
-                <div class="card" style="margin-bottom: 10px;">
+                <div class="card" style="margin-bottom: 10px; max-width:550px;">
                     <div class="cardtitle" style="display:flex; padding-right:5px;">
                         <h3>Chess Table</h3>
                         <button type="button" class="brown" style="margin-left:auto; cursor:pointer;" 
@@ -90,6 +90,29 @@
                     </div>
                 </div>
 
+                <div class="card" style="margin-bottom: 10px; max-width:550px;">
+                    <div class="cardtitle" style="display:flex; padding-right:5px;">
+                        <h3>Chess Pieces</h3>
+                        <button type="button" class="brown" style="margin-left:auto; cursor:pointer;" 
+                            onclick="location.href='projects/chesspieces.html'" >
+                            Full details...
+                        </button>
+                    </div>
+                    <div class="clearfix cardbody" >
+                        <div class="clearfix" style="display:block;">
+                            <a href="projects/chesstable.html" >
+                                <img srcset="wwwroot/images/ChessPieces_300x200.webp 260w, wwwroot/images/ChessPieces_300x200.webp 680w"
+                                sizes="(max-width: 720px) 500px, 680px" 
+                                src="wwwroot/images/ChessPieces_300x200.webp" alt="Chess table"
+                                style="margin-right:15px; float:left;" />
+                            </a>
+                            <div class="clearfix" style="min-width:100px;">
+                                <p>Modifying, 3D printing and hand painting custom chess pieces, We will use these pieces for our Chess table project</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
                 
                 <hr />
                 <h3 style="margin-bottom:0px;">Videos</h3>    
@@ -130,7 +153,7 @@
             </div>
         
         </div>
-        
+
         <script src="wwwroot/javascript/site.js"></script>
     </body>
 </html>
