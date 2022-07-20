@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="application-name" content="BuiltClever">
+    <meta name="author" content="Scott Ward">
+    <link rel="icon" type="image/ico" href="../favicon.ico"/>
+    <link rel="shortcut icon" sizes="192x192" href="../wwwroot/images/logo_192.png" type="image/x-icon">
+    <link rel="shortcut icon" sizes="72x72" href="../wwwroot/images/logo_72.png" type="image/x-icon">
+    <link rel="shortcut icon" sizes="48x48" href="../wwwroot/images/logo_48.png" type="image/x-icon">
+    <link rel="shortcut icon" sizes="24x24" href="../wwwroot/images/logo_24.png" type="image/x-icon">
+    <link rel="shortcut icon" sizes="16x16" href="../favicon.ico" type="image/ico">
+    <link rel="stylesheet" href="../wwwroot/css/sitebc.css">
+</head>
+<body>
+    <!--Navigation bar-->
+    <div class="clearfix" style="display:block; background-color: #333; overflow:hidden;">
+        <div style="margin:0px 80px 0px 10px; float:left;">
+            <div style="display:flex;">
+                <img src="../wwwroot/images/logo_50_4.png" width="50px", height="50px" style="margin-top:6px; margin-right:15px;" />
+                <h1 class="title">Built Clever</h1>
+            </div>
+        </div>
+        <div class="topnav" style="float:left;">
+            <a href=".././">Home</a>
+            <a class="active" href="../projects.html">Projects</a>
+            <a href="../info.html">Info</a>
+            <a href="../about.html">About</a>
+        </div>
+    </div>
+
+    <div class="main" style="margin-left: 15px; margin-right: 15px;"> 
+       <!-- Title - back Button -->
+        <div Style="display:flex;">
+            <button type="button" class="green" style="cursor:pointer;" 
+                onclick="location.href='../projects.html'" >
+                <img src="../wwwroot/images/Back.png">
+            </button>
+            <h2 style="margin-left:15px; margin-bottom:15px;">Chess program</h2>
+        </div>
+        
+        <div class="clearfix" >
+            <img srcset="../wwwroot/images/ChessProgram_300x200.webp 260w, ../wwwroot/images/ChessProgram_300x200.webp 680w"
+                        sizes="(max-width: 720px) 500px, 680px" 
+                        src="../wwwroot/images/ChessProgram_300x200.webp" alt="Chess program"
+                        style="margin-left:15px; float:right;" /> 
+            <div class="clearfix" style="min-width:100px;">
+                <p>Tutorial on making a chess program</p>
+                <p>we will use for the brains of our chess table</p>
+            </div>
+            
+            <hr />
+
+            <div style="display:block;">
+                <div class="clearfix" style="display:inline-block; width:315px; min-width:315px; margin-bottom:10px; margin-right:25px;">
+                    <p style="color:slateblue; margin-bottom:5px; margin-top:5px;">Chess Programming video</p>
+                    <a href="https://www.youtube.com/watch?v=CqXGBkAhBnc" >
+                        <img src="../wwwroot/images/ChessGameProgramming.webp" alt="Programming" />
+                    </a>
+                    <p style="float:left; margin:0px;">Programming a chess game</p>
+                    <p style="float:right; margin:0px;">run time: 1:01:56</p>
+                </div>        
+            </div>
+
+           
+            <hr />
+
+            <p>In this video I teach the computer the rules of chess by making a chess game.
+            <br />
+            It is programming based but mainly its the concept of teaching a computer to understand the rules of chess.</p>
+            
+            <p>I did the programming in Visual basic, but the concept can be applied to any programming language.</p>
+
+            <p>I will open source the code in C# (as I know more people use it than VB) I will add a link here when I have done that
+            <br />
+            Subscribe and add a comment to the video to encourage me to finish and tidy up the code to do this sooner
+            </p>
+
+           <p>I am making this program connect to our chess table build via bluetooth and it will control the chess playing part of our table
+           <br />
+            as well as the LED lights for showing valid moves, etc 
+            <br />
+            and the AI for the computer playing side so you can play on our chess table against the computer 
+           </p>
+
+           <p>I will be updating the program further,
+            <br />
+            but this video shows it in a simpler form which is better for understanding how a chess game works without a lot of extra code polluting the learning experience.
+            <br />
+            The next part will include hooking up the Stockfish chess engine to allow playing against the computer
+           </p>
+        </div>
+        
+
+        
+
+        
+        
+    </div>
+   
+    <script src="../wwwroot/javascript/site.js"></script>
+</body>
+</html>
