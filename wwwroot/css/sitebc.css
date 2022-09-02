@@ -136,3 +136,7 @@ label.line {
   content: "\2796"; /* Unicode character for "minus" sign (-) */
 }
 /* #endregion */
+
+.datelabel {
+  color:#9E9A41;
+}
