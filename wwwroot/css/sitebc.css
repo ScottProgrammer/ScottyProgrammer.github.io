@@ -64,17 +64,32 @@ label.line {
 .cardbody {
   padding:10px;
 }
+
+.cardtitlesml {
+  border-bottom: 1px solid #5A3D34;
+  background-color: #D4BC9C;
+  padding:5px 10px;
+  border-radius:5px 5px 0px 0px;
+}
+
+.cardtitlesml h5 {
+  margin-bottom:2px;
+  margin-top:2px;
+  color:#31261E;
+}
 /* #endregion */
+
 
   /* #region "Navbar" */
 /* Add a background color to the top navigation */
 .topnav {
   overflow: hidden;
+  margin-top:8px;
 }
 
 /* Style the links inside the navigation bar */
 .topnav a {
-  margin-top:15px;
+  margin-top:5px;
   float: left;
   color: #f2f2f2;
   text-align: center;
