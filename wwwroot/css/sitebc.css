@@ -65,17 +65,20 @@ label.line {
   padding:10px;
 }
 
+.cardsml {
+  border:1px solid #5A3D34;
+  border-radius:5px 5px 3px 3px;
+  display:inline-block;
+  max-width: 48%;
+  margin-top:10px;
+  word-break: break-all;
+}
+
 .cardtitlesml {
   border-bottom: 1px solid #5A3D34;
   background-color: #D4BC9C;
   padding:5px 10px;
   border-radius:5px 5px 0px 0px;
-}
-
-.cardtitlesml h5 {
-  margin-bottom:2px;
-  margin-top:2px;
-  color:#31261E;
 }
 /* #endregion */
 
@@ -137,6 +140,10 @@ label.line {
   overflow: hidden;
   transition: max-height 0.2s ease-out;
   background-color: #f1f1f1;
+}
+
+.collapsiblebody.open {
+  max-height: none;
 }
 
 .collapsible:before {

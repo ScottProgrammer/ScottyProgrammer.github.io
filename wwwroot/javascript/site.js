@@ -1,11 +1,18 @@
-// allow collapsible to expand and retreact
+// allow collapsible to expand and retract
 var coll = document.getElementsByClassName("collapsible");
 var i;
 //console.log("testing" + coll.length);
 for (i = 0; i < coll.length; i++) {
     coll[i].addEventListener("click", function() {
-      this.classList.toggle("active");
       var content = this.nextElementSibling;
+
+      if (content.classList.contains("open") == true)
+      {
+        content.classList.remove("open");
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+      this.classList.toggle("active");
+            
       if (content.style.maxHeight){
         content.style.maxHeight = null;
       } else {
