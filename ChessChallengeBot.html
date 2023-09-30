@@ -1,0 +1,1513 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="application-name" content="BuiltClever">
+        <meta name="author" content="Scott Ward">
+        <link rel="icon" type="image/ico" href="favicon.ico"/>
+        <link rel="shortcut icon" sizes="192x192" href="wwwroot/images/logo_192.png" type="image/x-icon">
+        <link rel="shortcut icon" sizes="72x72" href="wwwroot/images/logo_72.png" type="image/x-icon">
+        <link rel="shortcut icon" sizes="48x48" href="wwwroot/images/logo_48.png" type="image/x-icon">
+        <link rel="shortcut icon" sizes="24x24" href="wwwroot/images/logo_24.png" type="image/x-icon">
+        <link rel="shortcut icon" sizes="16x16" href="favicon.ico" type="image/ico">
+        <link rel="stylesheet" href="wwwroot/css/sitebc.css">
+    </head>
+    <body>
+        <!--Navigation bar-->
+        <div class="clearfix" style="display:block; background-color: #333; overflow:hidden;">
+            <div style="margin:0px 80px 0px 10px; float:left;">
+                <div style="display:flex;">
+                    <img src="wwwroot/images/logo_50_4.png" width="50px", height="50px" style="margin-top:6px; margin-right:15px;" />
+                    <h1 class="title">Built Clever</h1>
+                </div>
+            </div>
+            <div class="topnav" style="float:left;">
+                <a href="./">Home</a>
+                <a href="projects.html">Projects</a>
+                <a href="downloads.html">Downloads</a>
+                <a href="info.html">Info</a>
+                <a href="about.html">About</a>
+                <a class="active" href="projects.html">Chess Challenge Bot</a>
+            </div>
+        </div>
+
+        <div class="main" ontouchstart="touchStart(event, 'projects')" ontouchmove="touchMove(event)" ontouchend="touchEnd()" > 
+            <!-- Title -->
+            <div style="display:block;">
+                <h2 style="margin-bottom:5px;">Chess challenge Bot</h2>
+            </div>
+
+            <div style="margin-bottom:15px;">
+                Hi Sebastian, </br></br>
+                here is the full code for my bot, this one has all the debug code and code that didn't make the cut.</br>
+                No need to really look at it, but if you wanted to see more of what went in to making a bot for the challenge, this shows it way better than just the simple submission.</br>
+                this one will not make the token limit but is the same code as my submission just with debug code, the extra code that didn't make the cut is still commented out </br>
+                Thanks again for such a fun challenge.
+            </div>
+            
+            <div>
+                A complex but simple bot, using MinMax, alpha beta pruning, iterative deepening, quiescence search, transposition tables, square weight tables with a pretty basic evaluation. </br>
+                It plays pretty well but the basic evaluation means it has a horrible end game. </br> </br>
+                
+                I spent way to long figuring all this out but had heaps of fun (and some nightmares).</br>
+                This has been a very interesting project, I have learnt a lot from it.</br></br>
+                
+                I have coded a chess game before this challenge (not the bot part) just a 1 or 2 player chess game that uses stockfish for the computer AI).</br>
+                I am making it to be an interface with a physical chess table me and my girlfriend are building that lights up and will move the real pieces on the board with magnets and motors (not quite finished yet as I keep getting distracted by things like a three month chess bot building challenge :) )</br>
+                if you are interested or want a bit of a laugh seeing someone code a chess game before knowing about bitboards, etc just purely figuring it all out as I go, </br>
+                check out our small channel <a href="https://www.youtube.com/@BuiltClever"ur>@builtclever</a> on YouTube. specifically the "Programming a chess game" video</br>
+                and this is our web site.</br> </br>
+                
+                can't wait to see the next video on all the bot submissions </br>
+            </div>
+
+            <div>
+                <pre> 
+                    <code> 
+using ChessChallenge.API;
+using System;
+using System.Linq;
+using System.Collections.Generic;
+//using System.Diagnostics; // #DEBUG
+
+// https://github.com/SebLague/Chess-Challenge
+// https://seblague.github.io/chess-coding-challenge/documentation/
+// https://www.chessprogramming.org/Perft
+// https://stackoverflow.com/questions/68684989/how-to-implement-a-minimax-algorithm-in-a-chess-like-game
+// https://www.youtube.com/watch?v=l-hh51ncgDI 
+// https://gamedev.net/tutorials/programming/artificial-intelligence/chess-programming-part-v-advanced-search-r1197/ good info on quiescence search
+// https://stackoverflow.com/questions/17510606/quiscence-search-performance
+
+// https://chesshub.com/analysis/new analysis of next move after a position
+// https://stackoverflow.com/questions/16500739/chess-high-branching-factor
+// https://github.com/Akshara-Bulkapuram/Chess-game/blob/main/Chess_code.ipynb Negmax example
+// https://github.com/Quanghihicoder/Chess_AI/blob/master/ChessAIForms/AI.cs minmax (not negmax)
+// https://github.com/yigitkucuk/Theodora/blob/main/main.py
+// https://github.com/erosten/Bengal/blob/main/src/searcher_pvs.py
+// https://tearth.dev/posts/performance-of-chess-engines-written-in-csharp-part-1/
+
+// Bot size
+// 1331 before more improvements
+// 1327
+// 1315 // improvements to SquareWeight
+// 1223 // split out and combined move weight with eval score parts shared by Order moves and eval
+// 1206 // Is white minimising an improving
+// 1192 
+// 1202 ??
+// 1156 use global vars for bestMove bestScore rather than returning them through multiple functions
+// 1131 DebugBestMoves() had an error trap still being counted and this is test code added //#Debug comments
+// 1100 used hardcoded numbers in transition table for node type rather than nicer enum
+// 1093 got rid of single condition if brackets { }. (left them commented out as I'm not a monster)
+// 1084 changed multi dimension array initialisers from "new int[][]" to just "new []"
+// 1079 was passing zorbistKey to iterativeDeepening when not need yet
+// 1069 declare multiple int variables with , so don't need to repeat int
+// 1068
+// 1039 removed king end game weight values (29 tokens)
+// 1019 in iterative deepening simplified the moving best move first code
+// 990 converted separate bitBoard and value arrays in to a single array
+// 977 simplify checkmate stalemate in eval
+// 985 simple repetition check
+// 980 use Move.NullMove rather the nullable Move?
+// 1001 Fix black making bad moves because of bad square weight conversions
+// 1072 start of adding timed limit for iterative deepening
+// 1055 had some debug code with //DEBUG instead of //#DEBUG so was still counted
+// 1060 using GetLegalMovesNonAlloc
+// 1056 remove isWhite param from AddWeightToMove and used c_Board.IsWhite directly
+// 1054 changed getEval isCheckMate isStaleMate to 1 line using ?
+// 1049 made piece weights do 1 / -1 * weight so could remove black weights from array
+// 1040 in minmax use c_Board.ZobristKey directly rather than passing it in
+// 1034 added horrible code to set PieceType to global variable before calling SquareWeightByPiece rather than passing it as a parameter
+// 1031 get checkmate detect in search to set c_Bestmove directly rather then use c_intBestEvalThisIteration and c_BestMoveThisIteration
+// 1023 removed pawn promotion weighting
+
+// TODO if enough tokens
+// better eval
+// king end game bb
+// start moves bbs
+// better time limit for iterative deepening more depth if added
+// Killer moves
+
+// tokens 1023 of 1024
+
+// 36 games 22 wins 11 loses
+
+//Game 138 of 1000
+//mybot
+//score: +91 = 14 - 32
+//timouts: 2
+//illegal moves: 0
+//Evil Bot
+//score: +32 = 14 - 91
+//timouts: 35
+//illegal moves: 0
+
+internal class MyBot : IChessBot
+{
+
+    // Allow debug statement when running in release mode
+    //[System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Auto)]// #DEBUG
+    //public static extern void OutputDebugString(string message);// #DEBUG
+
+    //bool c_PlayStartMove = false; // #DEBUG
+    //bool c_debug1 = false;// #DEBUG
+    //bool c_blnIterativeDeepening = true; // #DEBUG
+    //int c_intBeforeEval; // #DEBUG
+    //int c_intNodes; // #DEBUG
+    //int c_intPerft; // #DEBUG
+    //int c_intCaptures; // #DEBUG
+    //long c_lngMemory = 0; // #DEBUG
+    //int c_intEvalTime = 0; // #DEBUG
+    //int c_intMoveNumber = 0; // #DEBUG 
+    //int c_intDepthReached = 0; // #DEBUG
+
+    /// <summary>
+    /// Best move found on this iteration
+    /// </summary>
+    Move c_BestMove, // Best move in Search
+            c_BestMoveThisIteration; // Best move found on this iteration (MinMax)
+
+    /// <summary>
+    /// Best eval for this iteration
+    /// </summary>
+    int c_intBestEval,  // Best eval in Search
+        c_intBestEvalThisIteration, // Best eval for this iteration (MinMax)
+        c_intThisMoveTimeAllowed; // The time allowed to think for the current move  
+
+    //bool c_blnInEndGame; 
+
+    Timer c_Timer;  
+    Board c_Board;
+
+    //int[] c_PieceValues = { 100, 300, 300, 500, 900, 9000, -100, -300, -300, -500, -900, -9000 };
+    int[] c_PieceValues = { 100, 300, 300, 500, 900, 9000 }; 
+    //ulong[][] c_PieceMoveWeightBB;
+    //int[][] c_PieceMoveWeightValues;
+    ulong[][] c_PieceMoveWeights;
+
+    #region "Transposition table"
+    //[System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)] // #DEBUG
+    private struct TranspositionEntry
+    {
+        //public int score;
+        //public int depth;
+        //public int nodeType; // eNodeType nodeType;
+        //public Move? move;
+
+        public int score, 
+                    depth,
+                    nodeType;
+        public Move move;
+    }
+
+    // *** save tokens use hard coded numbers
+    //private enum eNodeType
+    //{
+    //    Exact,
+    //    LowerBound,
+    //    UpperBound
+    //}
+
+    // transposition table to store the alpha beta values for each position
+    Dictionary<ulong, TranspositionEntry> c_colTranspositionTable = new();
+    #endregion 
+
+    // Constructor
+    public MyBot()
+    {
+
+        //c_lngMemory = System.GC.GetTotalMemory(true);// #DEBUG
+
+        #region "Weighted Move Bit boards"
+
+        #region "Readable weightings (for reference)"
+        //Dim c_Pawns As Integer() = {
+        //    0, 0, 0, 0, 0, 0, 0, 0,
+        //    5, 10, 10, -20, -20, 10, 10, 5,
+        //    5, -5, -10, 0, 0, -10, -5, 5,
+        //    0, 0, 0, 20, 20, 0, 0, 0,
+        //    5, 5, 10, 25, 25, 10, 5, 5,
+        //    10, 10, 20, 30, 30, 20, 10, 10,
+        //    50, 50, 50, 50, 50, 50, 50, 50,
+        //    0, 0, 0, 0, 0, 0, 0, 0}
+
+        //Dim c_Knights As Integer() = {
+        //    -50, -40, -30, -30, -30, -30, -40, -50,
+        //    -40, -20, 0, 0, 0, 0, -20, -40,
+        //    -30, 0, 10, 15, 15, 10, 0, -30,
+        //    -30, 5, 15, 20, 20, 15, 5, -30,
+        //    -30, 0, 15, 20, 20, 15, 0, -30,
+        //    -30, 5, 10, 15, 15, 10, 5, -30,
+        //    -40, -20, 0, 5, 5, 0, -20, -40,
+        //    -50, -40, -30, -30, -30, -30, -40, -50}
+
+        //Dim c_Bishops As Integer() = {
+        //    -20, -10, -10, -10, -10, -10, -10, -20,
+        //    -10, 0, 0, 0, 0, 0, 0, -10,
+        //    -10, 0, 5, 10, 10, 5, 0, -10,
+        //    -10, 5, 5, 10, 10, 5, 5, -10,
+        //    -10, 0, 10, 10, 10, 10, 0, -10,
+        //    -10, 10, 10, 10, 10, 10, 10, -10,
+        //    -10, 5, 0, 0, 0, 0, 5, -10,
+        //    -20, -10, -10, -10, -10, -10, -10, -20}
+
+        //Dim c_Rooks As Integer() = {
+        //    0, 0, 0, 0, 0, 0, 0, 0,
+        //    5, 10, 10, 10, 10, 10, 10, 5,
+        //    -5, 0, 0, 0, 0, 0, 0, -5,
+        //    -5, 0, 0, 0, 0, 0, 0, -5,
+        //    -5, 0, 0, 0, 0, 0, 0, -5,
+        //    -5, 0, 0, 0, 0, 0, 0, -5,
+        //    -5, 0, 0, 0, 0, 0, 0, -5,
+        //    0, 0, 0, 5, 5, 0, 0, 0}
+
+        //Dim c_Queen As Integer() = {
+        //    -20, -10, -10, -5, -5, -10, -10, -20,
+        //    -10, 0, 0, 0, 0, 0, 0, -10,
+        //    -10, 0, 5, 5, 5, 5, 0, -10,
+        //    -5, 0, 5, 5, 5, 5, 0, -5,
+        //    0, 0, 5, 5, 5, 5, 0, -5,
+        //    -10, 5, 5, 5, 5, 5, 0, -10,
+        //    -10, 0, 5, 0, 0, 0, 0, -10,
+        //    -20, -10, -10, -5, -5, -10, -10, -20}
+
+        //Dim c_KingMiddleGame As Integer() = {
+        //    -30, -40, -40, -50, -50, -40, -40, -30,
+        //    -30, -40, -40, -50, -50, -40, -40, -30,
+        //    -30, -40, -40, -50, -50, -40, -40, -30,
+        //    -30, -40, -40, -50, -50, -40, -40, -30,
+        //    -20, -30, -30, -40, -40, -30, -30, -20,
+        //    -10, -20, -20, -20, -20, -20, -20, -10,
+        //    20, 20, 0, 0, 0, 0, 20, 20,
+        //    20, 30, 10, 0, 0, 10, 30, 200}
+
+        //Dim c_KingEndGame As Integer() = {
+        //    -50, -40, -30, -20, -20, -30, -40, -50,
+        //    -30, -20, -10, 0, 0, -10, -20, -30,
+        //    -30, -10, 20, 30, 30, 20, -10, -30,
+        //    -30, -10, 30, 40, 40, 30, -10, -30,
+        //    -30, -10, 30, 40, 40, 30, -10, -30,
+        //    -30, -10, 20, 30, 30, 20, -10, -30,
+        //    -30, -30, 0, 0, 0, 0, -30, -30,
+        //    -50, -30, -30, -30, -30, -30, -30, -50}
+        #endregion
+
+        // Note can't use negative numbers for uLong values, so added 50 to them that gets subtracted when using
+        c_PieceMoveWeights = new[]
+        {
+        // myPawns {-20, -10, -5, 0, 5, 10, 20, 25, 30, 50}
+        new ulong[]{ 6144UL, 30UL,
+            2359296UL, 40UL,
+            4325376UL, 45UL,
+            18374686483548733695UL, 50UL,
+            837527109888UL, 55UL,
+            214559386265088UL, 60UL,
+            39582821253120UL, 70UL,
+            103079215104UL, 75UL,
+            26388279066624UL, 80UL,
+            71776119061217280UL, 100UL},
+        // Knights, { -50, -40, -30, -20, 0, 5, 10, 15, 20 }
+        new []{ 9295429630892703873UL, 0UL,
+            4792111478498951490UL, 10UL,
+            4323598035499155516UL, 20UL,
+            18577348462920192UL, 30UL,
+            16961067477378048UL, 50UL,
+            283472173056UL, 55UL,
+            39582420959232UL, 60UL,
+            26543503441920UL, 65UL,
+            103481868288UL, 70UL },
+        // Bishops { -20, -10, 0, 5, 10 }
+        new []{ 9295429630892703873UL, 30UL,
+            9115709513998107006UL, 40UL,
+            35538415940287488UL, 50UL,
+            40020505281024UL, 55UL,
+            26492373172224UL, 60UL },
+        // Rooks { 0, 5, 10, -5 }
+        new []{ 18374825561424821991UL, 50UL,
+            36310271995674648UL, 55UL,
+            35465847065542656UL, 60UL,
+            142393223512320UL, 45UL },
+        // Queens { -20, -10, -5, 0, 5 }
+        new []{ 9295429630892703873UL, 30UL,
+            7386326700872794470UL, 40UL,
+            1729382810977828888UL, 45UL,
+            35538701555752448UL, 50UL,
+            66229410471936UL, 55UL },
+        // King Middle Game { -50, -40, -30, -20, -10, 0, 10, 20, 30 }
+        new []{ 1736164147709607936UL, 0UL,
+            7378697628168486912UL, 10UL,
+            9331882295650418688UL, 20UL,
+            2172518400UL, 30UL,
+            8454144UL, 40UL,
+            15384UL, 50UL,
+            36UL, 70UL,
+            50049UL, 80UL,
+            66UL, 90UL }//,
+        // King End Game { -50, -40, -30, -20, -10, 0, 20, 30, 40 }
+        //new []{ 9295429630892703873UL, 0UL,
+        //    4755801206503243776UL, 10UL,
+        //    2630526050584609662UL, 20UL,
+        //    1747959605373173760UL, 30UL,
+        //    10205951508480000UL, 40UL,
+        //    6755399441071104UL, 50UL,
+        //    39582420959232UL, 70UL,
+        //    26543503441920UL, 80UL,
+        //    103481868288UL, 90UL}
+        };
+        #endregion
+    }
+
+    public Move Think(Board board, Timer timer)
+    {
+
+        // ---------------------------------------------------------------------
+        // Debug Next move after loaded moves
+        // will play next move and break at end of sub so debugs can be examined 
+        // ---------------------------------------------------------------------
+        #region "Debug next move"
+        //if (c_PlayStartMove == true) // #DEBUG
+        //{// #DEBUG
+        // //c_PlayStartMove = false; // #DEBUG
+        // //  knight not being taken with b2b4 then b4c5
+        // //  string strMoves = "d2d4 c7c5 d4c5 b8a6 b2b4 a6c5"; // #DEBUG
+        // //  Check stop for repetition
+        // //string strMoves = "d2d4 c7c5 d4c5 b8a6 e2e4 a6c5 e4e5 d7d6 c1e3 f7f6 g1f3 h7h6 e3d4 e7e6 e5d6 c5e4 d6d7 d8d7 f1d3 e4c5 d3g6 e8d8 d4e3 b7b6 f3d4 f8d6 g6d3 d6e5 d3g6 a7a6 b1c3 e5d4 e3d4 e6e5 d4e3 a6a5 c3e4 c5a4 e4d6 d8e7 d6c4 b6b5 g6e4 a8a6 d1d7 e7d7 e4f5 d7d8 a1d1 d8c7 f5c8 a6c6 c4d6 g8e7 d6e4 c6c4 e4c5 a4c5 e3c5 e7c8 c5e3 c4c2 d1d2 c2c1 d2d1 c1c6 d1d2 c6e6 d2c2 c7d6 c2d2 d6c6 d2c2 c6d6 c2d2 d6c6"; // #DEBUG
+        // // Weird horse move giving it away
+        // //string strMoves = "e2e4 d7d5 e4d5 d8d5 d2d4 c7c5 g1f3 h7h6 c1e3 c5d4 f3d4 b7b6 d4f3 e7e6 f1d3 b8c6 b1c3 d5d6 d3e4 e8e7 f3e5"; // #DEBUG
+
+        //    //string strMoves = "g1f3 h7h6 b1c3 d7d6 e2e4 f7f5 f3d4 g7g6"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 e2e4 d7d6 d2d4 c7c5 d4c5 d6c5 d1d8 e8d8 g1f3 f7f5 f3e5 d8e8 f1b5 c8d7 e4f5 h8h7 c3d5 e8d8 b5d3 d7e8 d5f4 e8d7"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 g1f3 c7c6 e2e4 d7d5 f3e5 d5e4"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 g1f3 d7d6 e2e4 f7f5 d2d4 c7c5 f1b5 b8c6"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 g1f3 c7c6"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 g1f3 c7c6 d2d4 d7d6 e2e4 d6d5 c1e3 f7f5"; // #DEBUG
+        //    //string strMoves = "d2d4 b8c6 d4d5 c6e5 f2f4 e5g6 f4f5"; // #DEBUG
+        //    //string strMoves = "b1c3 h7h6 g1f3 d7d6"; // #DEBUG
+        //    //string strMoves = "d2d4 e7e6 c2c3"; // #DEBUG
+
+        //    // was Losing queen when easy king safety move
+        //    //string strMoves = "d2d4 c7c5 d4d5 e7e6 e2e4 g8f6 b1c3 e6d5 e4d5 b7b5 d5d6 d8b6 c3b5 a7a6 b5c7"; // #DEBUG
+
+        //    // loses bishop for pawn trade off (eval score didn't seem to show that)
+        //    //string strMoves = "b1c3 h7h6 e2e4 d7d6 g1e2 f7f5 f2f3 f5e4 c3e4 c7c6 d2d4 e7e5 d4e5 d6e5 d1d8 e8d8 f3f4 b8d7 f4e5 d7e5 e2f4 c6c5 c1e3 c5c4 e1c1 c8d7 e3d4 d7g4 d4e5 g4d1 c1d1 g8e7 f1c4 e7f5 f4e6 d8e7 e6f8 h8f8 d1c1 e7d8 e4c5 f8e8"; // #DEBUG
+
+        //    // Min max takes a while to process = bad move
+        //    //string strMoves = "d2d4 d7d6 d4d5 b8d7 e2e4 g8f6 b1c3"; // #DEBUG
+
+        //    // Test takes check mate when can
+        //    //string strMoves = "e2e4 f7f6 d2d4 g7g5"; // for white // #DEBUG
+        //    //string strMoves = "g2g4 e7e5 f2f4"; // for black // #DEBUG
+        //    string strMoves = "b1c3 h7h6 e2e4 c7c6 g1f3 d7d5 f1d3 d5d4 c3e2 c6c5 b2b4 b7b6 b4c5 b6c5 d3b5 b8d7 b5c6 a8b8 e4e5 e7e6 "; // for black // #DEBUG
+
+
+        //    string[] aryMoves = strMoves.Split(" "); // #DEBUG
+        //    foreach (string strMove in aryMoves) // #DEBUG
+        //    { // #DEBUG
+        //        try // #DEBUG
+        //        { // #DEBUG
+        //            if (strMove != "") // #DEBUG
+        //            { // #DEBUG
+        //                board.MakeMove(new Move(strMove, board)); // #DEBUG
+        //            } // #DEBUG
+        //        } // #DEBUG
+        //        catch (Exception ex) // #DEBUG
+        //        { // #DEBUG
+        //            string message = ex.Message; // #DEBUG
+        //        }// #DEBUG
+        //    }// #DEBUG
+        //}// #DEBUG
+        #endregion 
+
+
+
+        c_Board = board;
+        c_Timer = timer; 
+        
+        //int intBeforeEval = GetEval();// #DEBUG
+        //int intCaptures = c_intCaptures; // #DEBUG
+        //int intTime = timer.MillisecondsElapsedThisTurn; // #DEBUG
+        // Reset nodes searched count for each new move
+        //c_intNodes = 0; // #DEBUG
+
+
+        //if (c_blnIterativeDeepening == true) // #DEBUG
+        //{ // #DEBUG
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            // Iterative Deepening
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            IterativeDeepening(); // move param depth 10 in to function to save a few tokens
+        //} // #DEBUG
+        //else // #DEBUG
+        //{ // #DEBUG
+            //// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            //// Search to depth of 4 (no time limit)
+            //// ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            //c_intBeforeEval = GetEval();   // #DEBUG
+
+            //c_BestMove = Move.NullMove;  // #DEBUG ' Helps find null moves rather than returning last move again
+            ////c_intBestEvalThisIteration = -50000; // set to this in search moves and not used until then
+
+            //// figure out best move order to start
+            //Span<Move> moves = stackalloc Move[256];
+            //GetOrderdEvaluatedLegalMoves(ref moves, false);
+            //SearchMoves(4, moves);
+
+            //// Store found best move and eval
+            //c_BestMove = c_BestMoveThisIteration;
+            //c_intBestEval = c_intBestEvalThisIteration;
+            // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        //} // #DEBUG
+
+                
+
+//        if (c_debug1 == true) // #DEBUG
+//        { // #DEBUG
+//            Debug.Print("----------------------------------------------");  // #DEBUG
+//            Debug.Print("Move #" + c_intMoveNumber); // #DEBUG
+//            c_intMoveNumber++; // #DEBUG
+//            Debug.Print("before Eval: " + intBeforeEval);// #DEBUG
+
+//            int ttEntrySizeBytes = System.Runtime.InteropServices.Marshal.SizeOf<TranspositionEntry>();  // #DEBUG
+
+//            string strDebug = (c_Board.IsWhiteToMove ? "White: " : "Black: ") + "Move: " + c_BestMove.StartSquare.Name + c_BestMove.TargetSquare.Name + // #DEBUG
+//                 "  Eval:(" + (c_intBestEval - intBeforeEval) + ") (b:" + intBeforeEval + " e:" + c_intBestEval + ")" + // #DEBUG
+//                 ", Depth reached: " + c_intDepthReached + // #DEBUG
+//                 ", Nodes: " + c_intNodes + // #DEBUG
+//                 ", Captures: " + (c_intCaptures - intCaptures) + "  Total Caps: " + c_intCaptures + // #DEBUG
+//                 ", Perft: " + c_intPerft + // #DEBUG
+//                 ", Time: " + (timer.MillisecondsElapsedThisTurn - intTime) +  // #DEBUG
+//                 ", Table size: " + c_colTranspositionTable.Count +  // #DEBUG
+//                 ", Memory: " + Math.Round((System.GC.GetTotalMemory(false) - c_lngMemory) / (1024.0 * 1024.0), 2) + "MB" + // #DEBUG
+//                 "  --  " + ((ttEntrySizeBytes * c_colTranspositionTable.Count) / 1024 / 1024) + "mb" +// #DEBUG
+//                 ", +Eval Time: " + c_intEvalTime; // #DEBUG
+
+//#if DEBUG // #DEBUG 
+//        {// #DEBUG 
+//            Debug.Print(strDebug); // #DEBUG 
+//        } // #DEBUG 
+//#else // #DEBUG 
+//            { // #DEBUG 
+//                if (c_debug1 == true) // #DEBUG 
+//                { // #DEBUG 
+//                  // This requires "Enable unmanaged code debugging" is turned on in debug section ("open debug launch profiles UI")
+//                  // to see this message in the output window
+//                    OutputDebugString(strDebug + Environment.NewLine);  // #DEBUG 
+//                } // #DEBUG 
+//            } // #DEBUG 
+//#endif
+//            Debug.Print("----------------------------------------------");  // #DEBUG
+//        } // #DEBUG
+
+        //if (c_PlayStartMove == true) // #DEBUG
+        //{ // #DEBUG
+        //    Debugger.Break(); // #DEBUG
+        //} // #DEBUG
+
+
+        // ---------------------------------------------------------------------
+        // Return best move
+        // ---------------------------------------------------------------------
+        return c_BestMove;
+
+    }
+
+
+    //public int IsWhiteNum(bool IsWhite) =>
+    //    IsWhite ? 1 : -1;
+
+
+    #region "GetOrderdEvaluatedLegalMoves"
+    //private Move[] GetOrderdEvaluatedLegalMoves(bool blnIsWhite, bool blnCapturesOnly)
+    private void GetOrderdEvaluatedLegalMoves(ref Span<Move> moves, bool blnCapturesOnly)
+    {
+
+        //bool blnIsWhite = c_Board.IsWhiteToMove;
+        //var moves = c_Board.GetLegalMoves(blnCapturesOnly);
+        c_Board.GetLegalMovesNonAlloc(ref moves, blnCapturesOnly);
+
+        //// Randomise the moves so don't get the same move all the time (especially at the beginning of the game)
+        /// and helps stop repetition
+        //Random rnd = new(DateTime.Now.Millisecond);
+        //moves = moves.OrderBy(x => rnd.Next()).ToArray();
+        
+        // Sort moves to possible best moves first
+        moves.Sort((a, b) => AddWeightToMove(b, blnCapturesOnly) - AddWeightToMove(a, blnCapturesOnly));
+        //return moves.OrderByDescending(e => AddWeightToMove(e, c_Board.IsWhiteToMove, blnCapturesOnly)).ToList();
+
+        //return moves;
+
+    }
+    #endregion
+    
+    private int AddWeightToMove(Move move, bool blnCapturesOnly)
+    {
+
+        //int intScore = 0; 
+        //int intStartIndex = move.StartSquare.Index;
+        //int intTargetIndex = move.TargetSquare.Index;
+        //int intType = (int)move.MovePieceType - 1;
+
+        int intScore = 0;
+        c_intPieceType_SquareWeightByPiece = (int)move.MovePieceType - 1;
+
+        if (move.IsCapture)
+        //{
+            // If a capture order capturing good pieces with bad pieces first ie (queen with a pawn)
+            intScore += 10 * (c_PieceValues[(int)move.CapturePieceType - 1] - c_PieceValues[c_intPieceType_SquareWeightByPiece]);
+        //}
+
+        if (!blnCapturesOnly)
+        //{
+            //// Add new square score 
+            //intScore += SquareWeightByPiece(intTargetIndex, intType, blnIsWhite);
+            //// minus the old square score
+            //intScore -= SquareWeightByPiece(intStartIndex, intType, blnIsWhite);
+
+            // Add new square score, minus the old square score
+            intScore += SquareWeightByPiece(move.TargetSquare.Index, c_Board.IsWhiteToMove) - SquareWeightByPiece(move.StartSquare.Index, c_Board.IsWhiteToMove);
+
+            //// Discourage repetition
+            //if (c_PreviousMoves.ContainsKey(move.ToString()))
+            //{
+            //    intScore -= c_PreviousMoves[move.ToString()] * 80;
+            //}
+        //}
+
+        // Pawn promotion is good
+        //if (move.IsPromotion)
+        ////{
+        //    intScore += 800; // score as queen  
+        ////}
+
+
+        // Castling is good
+        //if (move.IsCastles)
+        //    intScore += 10;
+
+
+        // Check pawn structure
+        //intScore += EvaluatePawnStructure(c_Board.GetPieceList(PieceType.Pawn, true), true);
+
+        // End game
+        //if (c_blnInEndGame)
+        //{
+        //    // Encourage pawn to move up in end game
+        //    if (intType == 1) // 1 = PieceType.Pawn
+        //        intScore += 30;
+
+
+        //    // Encourage king to move closer to the other king
+        //    if (intType == 6) // 6 = PieceType.King 
+        //    {
+        //        int kingDistanceBefore = ChebyshevDistance(move.StartSquare.Index, c_Board.GetKingSquare(!blnIsWhite).Index);
+        //        int kingDistanceAfter = ChebyshevDistance(move.TargetSquare.Index, c_Board.GetKingSquare(!blnIsWhite).Index);
+        //        if (kingDistanceAfter < kingDistanceBefore)
+        //        {
+        //            intScore += 30;
+        //        }
+        //    }
+
+        //    //if (move.IsInCheck())
+        //    //    intScore += 50; // Check is good (stop king just jumping around every where when other piece can make moves)
+        //}
+
+        return intScore;
+
+    }
+
+    //int ChebyshevDistance(int sq1, int sq2)
+    //{
+    //    // Get the file and rank of each square
+    //    int file1 = sq1 % 8;
+    //    int file2 = sq2 % 8;
+    //    int rank1 = sq1 / 8;
+    //    int rank2 = sq2 / 8;
+
+    //    // Calculate the absolute file and rank distances
+    //    int fileDistance = Math.Abs(file2 - file1);
+    //    int rankDistance = Math.Abs(rank2 - rank1);
+
+    //    // Return the maximum of the file and rank distances
+    //    return Math.Max(fileDistance, rankDistance);
+    //}
+
+
+
+    int c_intPieceType_SquareWeightByPiece; // *** save tokens by setting this rather than passing it into SquareWeightByPiece
+
+    /// <summary>
+    /// Get the square weight of a square for a specific piece and color (shared by Order moves and eval)
+    /// </summary>
+    /// <param name="SquareIndex"></param>
+    /// <param name="PieceType">use pieceType - 1 eg(0=pawn, 1=knight)</param>
+    /// <param name="intIsWhite"></param>
+    /// <returns>Square weight value (same for black of white)</returns>
+    private int SquareWeightByPiece(int SquareIndex, bool blnIsWhite)
+    {
+
+        // *** save 2 tokens
+        //if (intIsWhite == -1) SquareIndex = 63 - SquareIndex; // reverse bit board for black
+        //ulong bit = 1UL << SquareIndex; // same as Math.Pow 2 ^ index
+        //ulong bit = 1UL << (intIsWhite == 1 ? SquareIndex : 63 - SquareIndex);
+        ulong bit = 1UL << (blnIsWhite ? SquareIndex : 63 - SquareIndex);
+
+        // Loop through bitBoards for pieceType to get its weight value
+        // Find which bit board the pieces in in to get the square weight value
+        // *** save tokens use 1 array of bb, value, bb, value, etc rather then 2
+        for (int i = 0; i < c_PieceMoveWeights[c_intPieceType_SquareWeightByPiece].Length; i += 2)
+        {
+            //ulong bb = c_PieceMoveWeights[PieceType][i];
+            //if ((bb & bit) == bit)
+            if ((c_PieceMoveWeights[c_intPieceType_SquareWeightByPiece][i] & bit) == bit)
+                return (int)c_PieceMoveWeights[c_intPieceType_SquareWeightByPiece][i + 1] - 50;
+        }
+
+        return 0;
+    }
+
+
+    #region "Get Eval"
+    private int GetEval() //, Move? move)
+    {
+
+        // count how much total time is spent evaluating the positions
+        //int intEvalTime = c_Timer.MillisecondsElapsedThisTurn; // #DEBUG
+        
+        //int i = 0,
+        int intEval = 0;
+
+        // -------------------------------------------------------
+        // Checkmate Stalemate
+        // -------------------------------------------------------
+        // *** save 2 tokens
+        intEval += c_Board.IsInCheckmate() ? -5000 : c_Board.IsInStalemate() ? 5000 : 0;
+        //if (c_Board.IsInCheckmate())
+        //    //{
+        //    // Checkmate is good
+        //    intEval += -5000;
+        ////intEval += blnWhite ? -5000 : 5000;
+        ////}
+
+        //else if (c_Board.IsInStalemate())
+        //    //{
+        //    // Stale mate is bad
+        //    // TODO: unless it stops a loses when your low on pieces and would lose
+        //    intEval += 5000;
+        //intEval += blnWhite ? 5000 : -5000;
+        //}
+
+        //int intMaterialScore = 0;
+        //int intPieceWeights = 0;
+
+        foreach (PieceList myPieceList in c_Board.GetAllPieceLists())
+        {
+            int intWhite = (myPieceList.IsWhitePieceList ? 1 : -1);
+            c_intPieceType_SquareWeightByPiece = (int)myPieceList.TypeOfPieceInList - 1;
+
+            // -------------------------------------------------------
+            // Material score
+            // -------------------------------------------------------
+            //intMaterialScore += myPieceList.Count * c_PieceValues[i]; // add pieces values
+            //intEval += myPieceList.Count * c_PieceValues[i]; // add pieces values (c_PieceValues + for white, - for black)
+            intEval += intWhite * myPieceList.Count * c_PieceValues[c_intPieceType_SquareWeightByPiece];
+
+            // -------------------------------------------------------
+            // piece square position weight
+            // -------------------------------------------------------
+            foreach (Piece myPiece in myPieceList)
+            //{
+                //int intPieceIsWhite = myPiece.IsWhite ? 1 : -1;
+                //intEval += intPieceIsWhite * SquareWeightByPiece(myPiece.Square.Index, (int)myPiece.PieceType - 1, myPiece.IsWhite);
+                //intEval += (myPiece.IsWhite ? 1 : -1) * SquareWeightByPiece(myPiece.Square.Index, (int)myPiece.PieceType - 1, myPiece.IsWhite);
+                //intPieceWeights += intPieceIsWhite * SquareWeightByPiece(myPiece.Square.Index, (int)myPiece.PieceType - 1, myPiece.IsWhite);
+                intEval += intWhite * SquareWeightByPiece(myPiece.Square.Index, myPiece.IsWhite);
+            //}
+
+            // Evaluate pawn structure
+            //if (myPieceList.TypeOfPieceInList == PieceType.Pawn)
+            //    intEval += intWhite * EvaluatePawnStructure(myPieceList, myPieceList.IsWhitePieceList);
+
+            //i++;
+        }
+        //intEval += intMaterialScore + intPieceWeights;
+
+        //// discourage repetition
+        //if (c_Board.IsRepeatedPosition())
+        ////{
+        //    intEval -= 50;
+        ////}
+
+        //// discourage repetition (when more than once)
+        //if (c_Board.GameRepetitionHistory.Count(e => e == c_Board.ZobristKey) > 1)
+        ////{
+        //    intEval = 0;
+        ////}
+
+        //c_intEvalTime += c_Timer.MillisecondsElapsedThisTurn - intEvalTime; // #DEBUG
+
+        return c_Board.IsWhiteToMove ? intEval : -intEval;
+        
+    }
+    #endregion
+
+    #region "' Evaluate pawn structure"
+    // NOTE: not enough tokens to add any of this (it usually didn't help that much in the grand scheme of things)
+    //public int EvaluatePawnStructure(PieceList p_PawnPieceList, bool IsWhite)
+    //{
+
+    //    int intEval = 0;
+    //    // -----------------------------------------------------------
+    //    // Connectedness evaluation
+    //    // -----------------------------------------------------------
+    //    // interconnected pawns include those beside each other as well as those protected by other pawns.
+    //    // This is because pawn connectivity is a measure of how well the pawns support each other and form a strong pawn structure.
+    //    // Pawns that are beside each other can prevent enemy pawns from advancing or capturing them,
+    //    // and also create potential passed pawns or pawn chains
+
+    //    // doubled pawns are not always bad for the interconnectivity test.
+    //    // The interconnectivity test is a measure of how many pawns are connected in some way, either horizontally, vertically, or diagonally.
+    //    // Pawns that are directly above or below another pawn are still connected vertically,
+    //    // and they can still support each other or prevent enemy pawns from advancing
+    //    ulong PawnBB = c_Board.GetPieceBitboard(PieceType.Pawn, IsWhite);
+
+    //    //ulong ShiftLeft = PawnBB << 1 & PawnBB; 
+    //    //ulong ShiftRight = PawnBB >> 1 & PawnBB; 
+    //    //ulong ShiftUp = PawnBB << 8 & PawnBB; 
+    //    //ulong ShiftDown = PawnBB >> 8 & PawnBB;
+    //    //ulong ShiftUpLeft = PawnBB << 9 & PawnBB;
+    //    //ulong ShiftUpRight = PawnBB << 7 & PawnBB;
+    //    //ulong ShiftDownLeft = PawnBB >> 7 & PawnBB;
+    //    //ulong ShiftDownRight = PawnBB >> 9 & PawnBB;
+    //    //ulong ConnectedPawns = ShiftLeft | ShiftRight | ShiftUp | ShiftDown | ShiftUpLeft | ShiftUpRight | ShiftDownLeft | ShiftDownRight;
+
+    //    // Same as above but less readable (saves tokens)
+    //    // OR the Shifted pieces with the original pawnBB to get the squares that 
+    //    ulong ConnectedPawns = (PawnBB << 1 & PawnBB) | (PawnBB >> 1 & PawnBB) | // Shift Left and Right
+    //                           (PawnBB << 8 & PawnBB) | (PawnBB >> 8 & PawnBB) | // Shift Up and down
+    //                           (PawnBB << 9 & PawnBB) | (PawnBB << 7 & PawnBB) | // Shift Up Left and Up Right
+    //                           (PawnBB >> 7 & PawnBB) | (PawnBB >> 9 & PawnBB); // Shift Down Left and Down Right
+
+    //    //c_Board.GetPiece(new Square( ) 
+    //    intEval += 10 * BitboardHelper.GetNumberOfSetBits(ConnectedPawns);
+
+
+
+    //    // -----------------------------------------------------------
+    //    // Pawn Mobility
+    //    // -----------------------------------------------------------
+    //    // Pawns that are mobile are more valuable than pawns that are blocked in.
+    //    // Mobile pawns can advance into the enemy's territory and create threats.
+    //    // A good score for pawns that can move forward or take is 5-7.
+    //    // This is because connected pawns are much more powerful than isolated pawns,
+    //    // as they can support each other and create a strong attacking force.
+    //    ulong AllPieces = c_Board.AllPiecesBitboard;
+
+    //    // Can move forward (not blocked) 
+    //    ulong canMoveForward = IsWhite ?
+    //                            (PawnBB << 8) & ~AllPieces :
+    //                            (PawnBB >> 8) & ~AllPieces;
+    //    //ulong canMoveForward;
+    //    //if (IsWhite)
+    //    //    //ulong ShiftUp = (PawnBB << 8);
+    //    //    //ulong canMoveForward = (ShiftUp & ~AllPieces); // RemoveOccupiedSquares
+    //    //    canMoveForward = (PawnBB << 8) & ~AllPieces;
+    //    //else
+    //    //    //ulong ShiftDown = PawnBB >> 8;
+    //    //    //ulong canMoveForward = (ShiftDown & ~AllPieces); // RemoveOccupiedSquares
+    //    //    canMoveForward = (PawnBB >> 8) & ~AllPieces;
+    //    intEval += 5 * BitboardHelper.GetNumberOfSetBits(canMoveForward);
+
+    //    // Can take
+    //    ulong OpponentPieces = IsWhite ? c_Board.BlackPiecesBitboard : c_Board.WhitePiecesBitboard;
+    //    ulong CapturePawns = IsWhite ?
+    //                          (PawnBB << 9 & OpponentPieces) | (PawnBB << 7 & OpponentPieces) :
+    //                          (PawnBB >> 7 & OpponentPieces) | (PawnBB >> 9 & OpponentPieces);
+    //    //ulong CapturePawns;
+    //    //if (IsWhite)
+    //    //    //ulong ShiftUpLeft = PawnBB << 9;
+    //    //    //ulong ShiftUpRight = PawnBB << 7;
+    //    //    CapturePawns = (PawnBB << 9 & OpponentPieces)  | (PawnBB << 7 & OpponentPieces);
+    //    //else
+    //    //    //ulong ShiftDownLeft = PawnBB >> 7;
+    //    //    //ulong ShiftDownRight = PawnBB >> 9;
+    //    //    CapturePawns = (PawnBB >> 7 & OpponentPieces) | (PawnBB >> 9 & OpponentPieces);
+
+    //    intEval += 6 * BitboardHelper.GetNumberOfSetBits(CapturePawns);
+
+
+
+    //    // More pawn evals
+
+    //    // -----------------------------------------------------------
+    //    // Control of the centre:
+    //    // -----------------------------------------------------------
+    //    // Pawns that control the centre of the board are more valuable than pawns on the flanks.
+    //    // this is currently achieved with the pawn square weight arrays 
+
+
+    //    ulong WhitePawns = c_Board.GetPieceBitboard(PieceType.Pawn, true);
+    //    ulong BlackPawns = c_Board.GetPieceBitboard(PieceType.Pawn, false);
+
+    //    foreach (Piece myPawn in p_PawnPieceList)
+    //    {
+    //        // -----------------------------------------------------------
+    //        // Passed pawns
+    //        // -----------------------------------------------------------
+    //        // Passed pawns are pawns that have no enemy pawns in front of them on any rank that can attack or block them during the game.
+    //        // Passed pawns are very valuable because they can easily be promoted to queens.
+
+    //        //  --- Use bit boards
+    //        //ulong SinglePawnBB = 1UL << myPawn.Square.Index;
+    //        //ulong PassedPawn;
+    //        //if (IsWhite)
+    //        //{
+    //        //    // the square that is directly in front of the pawn
+    //        //    ulong ShiftUp = SinglePawnBB << 8;
+    //        //    // the three squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB << 9) | (SinglePawnBB << 7);
+    //        //    // the six squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront << 16);
+    //        //    // the twelve squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront << 32);
+
+    //        //    // Bitwise AND the pawn mask with the black pawns bit board
+    //        //    PassedPawn = TwelvwSquaresInFront & BlackPawns;
+    //        //}
+    //        //else
+    //        //{
+    //        //    // the square that is directly in front of the pawn
+    //        //    ulong ShiftUp = SinglePawnBB >> 8;
+    //        //    // the three squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB >> 9) | (SinglePawnBB >> 7);
+    //        //    // the six squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront >> 16);
+    //        //    // the twelve squares that are in front of the pawn on the same file or adjacent files
+    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront >> 32);
+
+    //        //    // Bitwise AND the pawn mask with the black pawns bit board
+    //        //    PassedPawn = TwelvwSquaresInFront & BlackPawns;
+    //        //}
+
+    //        //if (PassedPawn == 0)
+    //        //    intEval += 8;
+
+    //        // --- Use Linq
+    //        if (IsWhite)
+    //        {
+    //            PieceList myBlackPawns = c_Board.GetPieceList(PieceType.Pawn, false);
+    //            // Any black pawns in front, same file or left or right a file
+    //            if (!myBlackPawns.Any(p => p.Square.File > myPawn.Square.File - 1 && p.Square.File < myPawn.Square.File + 1 &&
+    //                                 p.Square.Rank > myPawn.Square.Rank))
+    //            {
+    //                intEval += 8;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            PieceList myWhitePawns = c_Board.GetPieceList(PieceType.Pawn, true);
+    //            // Any black pawns in front, same file or left or right a file
+    //            if (!myWhitePawns.Any(p => p.Square.File > myPawn.Square.File - 1 && p.Square.File < myPawn.Square.File + 1 &&
+    //                                 p.Square.Rank < myPawn.Square.Rank))
+    //            {
+    //                intEval += 8;
+    //            }
+    //        }
+
+
+
+    //        // --------------------------------------------------------------------------
+    //        // doubled pawns
+    //        // two pawns of the same color on the same file
+    //        // --------------------------------------------------------------------------
+    //        // NOTE: save tokens (white will look forward for other pawns, while back will look back
+    //        // as we are checking all pawns either way is valid so save tokens by using one bit of code
+    //        // --- Use Linq
+    //        if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank > myPawn.Square.Rank))
+    //            intEval -= 2;
+
+    //        //if (IsWhite)
+    //        //{
+    //        //  --- Use bit boards
+    //        //  //Create a pawn mask for the current pawn
+    //        //  // the square that is directly in front of the pawn
+    //        //  ulong ShiftDown = SinglePawnBB >> 8;
+    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB >> 16);
+    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind >> 16);
+    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind >> 16);
+
+    //        //  ulong DoubledPawn = EightSquareBehind & WhitePawns;
+
+    //        //  if (DoubledPawn != 0)
+    //        //      intEval -= 2;
+
+    //        // NOTE: save tokens (white will look forward for other pawns, while back will look back
+    //        // as we are checking all pawns either way is valid so save tokens by using one bit of code
+    //        //  --- Use Linq
+    //        //  if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank > myPawn.Square.Rank))
+    //        //      intEval -= 2;
+
+    //        //}
+    //        //else
+    //        //{
+    //        //    --- Use bit boards
+    //        //  // Create a pawn mask for the current pawn
+    //        //  ulong ShiftDown = SinglePawnBB << 8;
+    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB << 16);
+    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind << 16);
+    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind << 16);
+
+    //        //  ulong DoubledPawn = EightSquareBehind & BlackPawns;
+
+    //        //  if (DoubledPawn != 0)
+    //        //      intEval -= 2;
+
+    //        // --- Use Linq
+    //        //  if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank < myPawn.Square.Rank))
+    //        //      intEval -= 2;
+    //        //}
+    //    }
+
+
+    //    //// -----------------------------------------------------------
+    //    //// Weaknesses
+    //    //// -----------------------------------------------------------
+    //    //// Pawn weaknesses are structural defects in your pawn structure,
+    //    //// such as doubled pawns, isolated pawns, and holes.
+    //    //// Pawn weaknesses can be exploited by your opponent to gain an advantage.
+
+    //    return intEval;
+    //}
+    #endregion 
+
+    #region "IterativeDeepening
+    //private (Move? BestMove, int BestScore) IterativeDeepening(ulong p_ulngPositionKey, int maxDepth)
+    private void IterativeDeepening()
+    {
+
+        //c_intBeforeEval = GetEval(); // #DEBUG
+        //int intSingleDepthNodes = c_intNodes; // #DEBUG
+        //int intSingleCaptures = c_intCaptures; // #DEBUG
+
+        //c_BestMove = Move.NullMove; // this is good for testing as if no move is returned you want null (not last move) but save tokens here
+        //c_intBestEvalThisIteration = -50000; // set to this in search moves and not used until then
+
+        // figure out best move order to start
+        Span<Move> moves = stackalloc Move[256];
+        GetOrderdEvaluatedLegalMoves(ref moves, false);
+        //var moves = GetOrderdEvaluatedLegalMoves(false);
+
+        #region "' End game check"
+        // Go in to end game mode (used to return material score from getEval)
+        //if (intMaterialScore < 9600 && c_blnInEndGame == false)
+        //{
+        //    // Change to king end game Weights
+        //    c_PieceMoveWeights[5] = c_PieceMoveWeights[6];
+        //    c_blnInEndGame = true;
+
+        //   // Change piece weight tables
+        //    for (int j = 1; j < 18; j += 2)
+        //    {
+        //        // Encourage pawns to move up
+        //        c_PieceMoveWeights[0][j] += 30UL + (ulong)j;
+
+        //        // Other pieces should value moves not square positions any more
+        //        c_PieceMoveWeights[1][j] = 0UL;
+        //        if (j < 10) c_PieceMoveWeights[2][j] = 0UL;
+        //        if (j < 8) c_PieceMoveWeights[3][j] = 0UL;
+        //        if (j < 10) c_PieceMoveWeights[4][j] = 0UL;
+        //    }
+        //}
+        #endregion 
+
+        for (int depth = 1; depth <= 25; depth++) // 25 was maxDepth passed in but need to save tokens (never gets close to that depth, but who knows on a different computer)
+        {
+            
+            if (depth > 1)
+            {
+                // -----------------------------------------------------------------
+                // put best move found during last depth first at next depth
+                // -----------------------------------------------------------------
+                // *** save tokens by not checking (speed improvement is not to move it if it is already first)
+                //if (moves.IndexOf(c_BestMoveThisIteration.Value) != 0) 
+                //{
+                //moves.Remove(c_BestMove);
+                //moves.Insert(0, c_BestMove);
+                //int intIndex = moves.IndexOf(c_BestMove);
+                // Swap the first item in the span with the temporary variable.
+                //moves[intIndex] = moves[0];
+                moves[moves.IndexOf(c_BestMove)] = moves[0];
+                moves[0] = c_BestMove;
+                //}
+            }
+
+            // Store the depth reached so we can report it in the main move debug statement
+            //c_intDepthReached = depth; // #DEBUG
+
+            //var result = SearchMoves(depth, moves.ToArray());
+            if (SearchMoves(depth, moves))
+            {
+                // if (SearchMoves = true) time limit was exceeded or checkmate detected, go with best move.
+                // checkmate: has already set c_BestBove
+                // timeout: check if current best move before exiting early is better than last depths best move
+                if (c_intBestEvalThisIteration > c_intBestEval)
+                //{
+                    c_BestMove = c_BestMoveThisIteration;
+                //}
+                return; // time limit was exceeded go with best move
+            }
+
+            // Store found best move and eval
+            c_BestMove = c_BestMoveThisIteration;
+            c_intBestEval = c_intBestEvalThisIteration;
+
+            //if (c_debug1 == true) // #DEBUG
+            //{ // #DEBUG
+            //  //Debug.Print("Depth: " + depth + // #DEBUG
+            //  //            "  Eval:(" + (c_intBeforeEval + result.BestScore) + ") (b:" + c_intBeforeEval + " e:" + result.BestScore + ")" +// #DEBUG
+            //  //            "  BestMove: " + result.BestMove.Value.StartSquare.Name + result.BestMove.Value.TargetSquare.Name); // #DEBUG
+            //    Debug.Print("Depth: " + depth + // #DEBUG
+            //               "  Eval:(" + (c_intBeforeEval + c_intBestEvalThisIteration) + ") (b:" + c_intBeforeEval + " e:" + c_intBestEvalThisIteration + ")" +// #DEBUG
+            //               "  BestMove: " + c_BestMoveThisIteration.StartSquare.Name + c_BestMoveThisIteration.TargetSquare.Name + // #DEBUG
+            //               "  Nodes: " + strsize(5, c_intNodes - intSingleDepthNodes) + // #DEBUG
+            //               "  Captures: " + strsize(5, c_intCaptures - intSingleCaptures)); // #DEBUG
+            //} // #DEBUG
+
+        }
+
+        // Return the best move and score
+        //return (c_BestMoveThisIteration, c_intBestEvalThisIteration);
+
+    }
+    #endregion
+
+    #region "Search Moves"
+    /// <summary>
+    /// Start searching moves at using the current depth
+    /// </summary>
+    /// <param name="intCurrentDepth"></param>
+    /// <param name="moves"></param>
+    /// <returns></returns>
+    private bool SearchMoves(int intCurrentDepth, ReadOnlySpan<Move> moves) 
+    {
+
+        int alpha = -50000,
+            beta = 50000;
+        c_intBestEvalThisIteration = -100000;
+
+        // ---------------------------------------------------------------
+        // Set Time limit
+        // Make a guess there we be approx 40 moves (80 half moves) in the game
+        // Update: the computer more often than not exceeds that by many move changed to 80
+        // NOTE: this is not a great way of estimating move time, but with limited tokens it will do for now
+        // ---------------------------------------------------------------
+        c_intThisMoveTimeAllowed = c_Timer.MillisecondsRemaining / (80 - Math.Min(c_Board.PlyCount / 2, 39));
+    
+        // if you want to be more conservative and save some time for the endgame, you can use a Factor of 0.8 or 0.9.
+        // If you want to be more aggressive and use more time in the opening and middle game, you can use a Factor of 1.1 or 1.2
+        //c_intThisMoveTimeAllowed *= Factor;
+
+
+        foreach (Move move in moves)
+        {
+            //c_intNodes += 1; // #DEBUG
+            //int intSingleCaptures = c_intCaptures; // #DEBUG
+            //int intSingleMoveNodes = c_intNodes; // #DEBUG
+            //int intSigleTime = c_Timer.MillisecondsElapsedThisTurn; // #DEBUG
+            //string strBetaCutoff = "β"; // #DEBUG
+
+
+            c_Board.MakeMove(move);
+
+            // ---------------------------------------------------------------
+            // If checkmate is found do it now
+            // ---------------------------------------------------------------
+            if (c_Board.IsInCheckmate())
+            {
+                c_Board.UndoMove(move);
+                // Save tokens the below code makes more sense
+                // as when it returns it checks 99999 is the highest current iteration eval
+                // and set c_BestMove to the current c_BestMoveThisIteration
+                // but we can bypass all that by just setting it directly
+                //c_intBestEvalThisIteration = 99999;
+                //c_BestMoveThisIteration = move;
+                c_BestMove = move;
+                return true; // no need to search any further depths
+            }
+
+            // ---------------------------------------------------------------
+            // Do each move a recursively call min max to check the moves after it
+            // ---------------------------------------------------------------
+            int intEval = -MinMax(-beta, -alpha, intCurrentDepth - 1); //, c_Board.ZobristKey);
+
+            // ---------------------------------------------------------
+            // Don't repeat positions (Stop repetition draw)
+            // ---------------------------------------------------------
+            if (c_Board.IsDraw())
+            //{
+                intEval = -50001;  // 1 is so can tell difference between base eval and draw
+            //}
+
+            c_Board.UndoMove(move);
+
+
+            //if (c_blnIterativeDeepening == true) // #DEBUG
+            //{ // #DEBUG
+                if (intEval == -2000000)
+                //{  // #DEBUG
+                //    if (c_debug1 == true) // #DEBUG
+                //    { // #DEBUG
+                //        Debug.Print("*** Time Limit exceeded return current best move *** limit:(" + c_Timer.MillisecondsElapsedThisTurn + ":" + c_intThisMoveTimeAllowed + ")   best move:" + c_BestMoveThisIteration);  // #DEBUG
+                //    } // #DEBUG
+                    return true; // true = time limit reached (stop iterative deepening code doing next depth)
+                //} // #DEBUG
+            //} // #DEBUG
+
+            if (intEval > c_intBestEvalThisIteration)
+            {
+                c_intBestEvalThisIteration = intEval;
+                c_BestMoveThisIteration = move;
+                //strBetaCutoff = " "; // #DEBUG
+            }
+
+            alpha = Math.Max(alpha, intEval);
+            
+
+            ////// ---------------------------------------------------------------
+            ////// check time limit
+            ////// ---------------------------------------------------------------
+            //////// there is usually always some very quick moves later in the game 
+            ////if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+            ////{ // #DEBUG
+            ////    Debug.Print("*** Time Limit exceeded return current best move *** limit:(" + c_Timer.MillisecondsElapsedThisTurn + ":" + c_intThisMoveTimeAllowed + ")   best move:" + c_BestMoveThisIteration);  // #DEBUG
+            ////    return true; // true = time limit reached (stop iterative deepening code doing next depth)
+            ////} // #DEBUG
+
+
+            // ---------------------------------------------------------------
+            // Log moves at base level with info for each move
+            // ---------------------------------------------------------------
+            //if (c_debug1 == true) // #DEBUG
+            //{ // #DEBUG
+            //    c_Board.MakeMove(move); // #DEBUG
+            //    int intStraightEval = -GetEval(); // #DEBUG
+            //    c_Board.UndoMove(move); // #DEBUG
+
+            //    if (c_Board.IsWhiteToMove)// #DEBUG
+            //    {// #DEBUG
+
+            //        //if (move.StartSquare.Name + move.TargetSquare.Name == "d2d3") // #DEBUG  
+            //        //{ // #DEBUG 
+            //        //    Debugger.Break(); // #DEBUG
+            //        //}; // #DEBUG 
+
+            //        Debug.Print("White " + move + // #DEBUG
+            //            "  Depth:" + intCurrentDepth +  // #DEBUG
+            //            strsize(15, " Eval:(" + (c_intBeforeEval + intEval) + ")") + strBetaCutoff + " (b:" + strsize(5, c_intBeforeEval) + " e:" + strsize(5, intEval) + ")" + // #DEBUG
+            //            "  Exact Eval:(" + strsize(5, intStraightEval) + ")" + // #DEBUG
+            //            "  Captures: " + strsize(5, c_intCaptures - intSingleCaptures) + // #DEBUG
+            //            "  Time taken: " + strsize(5, c_Timer.MillisecondsElapsedThisTurn - intSigleTime) + // #DEBUG
+            //            "  Time so far: " + strsize(5, c_Timer.MillisecondsElapsedThisTurn) + // #DEBUG
+            //            "  Time allowed: " + String.Format("{0,5}", (c_intThisMoveTimeAllowed)) + // #DEBUG
+            //            "  Nodes: " + strsize(5, c_intNodes - intSingleMoveNodes) + // #DEBUG
+            //            "  best: " + c_BestMoveThisIteration + // #DEBUG
+            //            "  tree: " + DebugBestMoves(move, 6)); // #DEBUG
+            //                                                    //"  Full Eval:(" + (c_intBeforeEval + intFullScore) + ") (b:" + c_intBeforeEval + " e:" + intFullScore + ")" + // #DEBUG
+
+            //    }// #DEBUG
+            //    else// #DEBUG
+            //    {// #DEBUG
+            //        Debug.Print("Black " + move + // #DEBUG
+            //            "  Depth:" + intCurrentDepth +  // #DEBUG
+            //            strsize(15, " Eval:(" + (c_intBeforeEval + intEval) + ")") + strBetaCutoff + " (b:" + strsize(5, c_intBeforeEval) + " e:" + strsize(5, intEval) + ")" + // #DEBUG
+            //            "  Exact Eval:(" + strsize(5, intStraightEval) + ")" + // #DEBUG
+            //            "  Captures: " + strsize(5, c_intCaptures - intSingleCaptures) + // #DEBUG
+            //            "  Time taken: " + strsize(5, c_Timer.MillisecondsElapsedThisTurn - intSigleTime) + // #DEBUG
+            //            "  Time so far: " + strsize(5, c_Timer.MillisecondsElapsedThisTurn) + // #DEBUG
+            //            "  Time allowed: " + String.Format("{0,5}", (c_intThisMoveTimeAllowed)) + // #DEBUG
+            //            "  Nodes: " + strsize(5, c_intNodes - intSingleMoveNodes) + // #DEBUG
+            //            "  best: " + c_BestMoveThisIteration +  // #DEBUG
+            //            "  tree: " + DebugBestMoves(move, 6)); // #DEBUG
+            //            //"  Full Eval:(" + (c_intBeforeEval + intFullScore) + ") (b:" + c_intBeforeEval + " e:" + intFullScore + ")" + // #DEBUG
+            //    }// #DEBUG
+            //}// #DEBUG
+        }
+                
+        return false;
+    }
+    #endregion
+
+    #region "Debug print spacing helpers"
+    //private string strsize(int length, string text) // #DEBUG
+    //{ // #DEBUG
+    //    return string.Format("{0," + length + "}", text); // #DEBUG
+    //} // #DEBUG
+    //private string strsize(int length, int text) // #DEBUG
+    //{ // #DEBUG
+    //    return string.Format("{0," + length + "}", text.ToString()); // #DEBUG
+    //} // #DEBUG
+    #endregion
+
+    #region "Debug Best Moves"
+    // Use the Transposition Table to show the best moves that decided the root best move
+    //private string DebugBestMoves(Move bestmove, int intLimit) // #DEBUG
+    //{ // #DEBUG
+    //    try // #DEBUG
+    //    { // #DEBUG
+    //        if (intLimit == 0) { return ""; } // #DEBUG
+    //        if (bestmove == Move.NullMove) { return ""; } // #DEBUG
+    //        if (c_Board.IsInCheckmate() || c_Board.IsInStalemate()) { return "***"; }  // #DEBUG
+    //        string strMove = bestmove.StartSquare.Name + bestmove.TargetSquare.Name + ", "; // #DEBUG
+
+    //        c_Board.MakeMove(bestmove); // #DEBUG
+    //        if (c_colTranspositionTable.TryGetValue(c_Board.ZobristKey, out var entry)) // #DEBUG
+    //        { // #DEBUG
+    //            if (!entry.move.IsNull) // #DEBUG
+    //            { // #DEBUG
+    //                strMove += DebugBestMoves(entry.move, intLimit - 1); // #DEBUG
+    //            } // #DEBUG
+    //        } // #DEBUG
+    //        c_Board.UndoMove(bestmove); // #DEBUG
+
+    //        return strMove;  // #DEBUG
+    //    }// #DEBUG
+    //    catch (Exception e)// #DEBUG
+    //    {// #DEBUG
+    //        string issue = e.Message;// #DEBUG
+    //        return "";// #DEBUG
+    //    }// #DEBUG
+    //} // #DEBUG
+    #endregion 
+
+    #region "MinMax with alpha beta pruning"
+    /// <summary>
+    /// This is the main search the one that checks every possible move
+    /// </summary>
+    /// <param name="alpha"></param>
+    /// <param name="beta"></param>
+    /// <param name="depth"></param>
+    /// <returns></returns>
+    private int MinMax(int alpha, int beta, int depth) //, ulong zobrist_key)
+    {
+
+        // So we know whether this is a best score node
+        int alpha_orig = alpha;
+
+        // ---------------------------------------------------------
+        // Search the transposition Table
+        // ---------------------------------------------------------
+        bool blnNewEntry = true;
+        if (c_colTranspositionTable.TryGetValue(c_Board.ZobristKey, out TranspositionEntry entry))
+        {
+            blnNewEntry = false;
+            if (entry.depth >= depth)
+            {
+                //// **** Save 1 token
+                //If the entry has a lower bound greater than or equal to beta, return it
+                int nodetype = entry.nodeType,
+                    score = entry.score;
+
+                // If the entry has a lower bound greater than or equal to beta, return it
+                if (nodetype == 0) // 0 = eNodeType.Exact)
+                    return score;
+
+                if (nodetype == 2 && score <= alpha) // 2 = eNodeType.UpperBound
+                    return alpha;
+
+                if (nodetype == 1 && score >= beta) // 1 = eNodeType.LowerBound
+                    return beta;
+
+            }
+        }
+
+
+        // ---------------------------------------------------------
+        // End of search
+        // Search captures
+        // ---------------------------------------------------------
+        if (depth == 0)
+            return QuiescenceSearch(alpha, beta, 6);
+
+
+        //// ---------------------------------------------------------
+        //// Don't repeat positions
+        //// ---------------------------------------------------------
+        ////if (c_Board.IsRepeatedPosition())
+        //if (c_Board.IsDraw())
+        //{
+        //    //return 0;
+        //    if (c_Board.IsWhiteToMove)
+        //        return -5000;
+        //    else
+        //        return 5000;
+        //}
+
+        Span<Move> moves = stackalloc Move[256];
+        GetOrderdEvaluatedLegalMoves(ref moves, false);
+        
+        Move BestMove = Move.NullMove;
+                        
+        int intBestEval = -50000,
+            EvalType = 2; // 2 = eNodeType.UpperBound
+
+        foreach (Move move in moves)
+        {
+            //c_intNodes++; // Count have many nodes are searched // #DEBUG
+
+            c_Board.MakeMove(move);
+            int intEval = -MinMax(-beta, -alpha, depth - 1); //, c_Board.ZobristKey);
+            c_Board.UndoMove(move);
+
+            // time out 
+            //if (intEval == -2000000) return 2000000; // used if added to QuiescenceSearch (removed to save tokens)
+            //if (c_blnIterativeDeepening == true) // #DEBUG
+            //{ // #DEBUG
+                if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+                    return 2000000; // Number bigger than eval allows
+            //} // #DEBUG
+
+            // Store move if better than best move 
+            if (intEval > intBestEval)
+            {
+                intBestEval = intEval;
+                BestMove = move;
+            }
+
+            // alpha beta pruning
+            if (intEval > alpha)
+            {
+                alpha = intEval;
+                
+                if (alpha >= beta)
+                //{
+                    break;
+                //}
+            }
+
+
+            //if (alpha >= beta)
+            //{
+            //    entry.score = intBestEval;
+            //    entry.depth = depth;
+            //    entry.type = eNodeType.Exact;
+            //    entry.move = move;
+            //    transpositionTable2[zobrist_key] = entry;
+            //    break;
+            //}
+
+        }
+
+        if (intBestEval >= beta) // failed high, lower bound
+        //{
+            EvalType = 1; // 1 = eNodeType.LowerBound 
+            // killers = non-captures that are beta-cutoffs
+            //if (intBestEval > beta
+            //        and not board.is_capture(best_move)
+            //        and best_move is not NULL_MOVE
+            //        and not best_move.promotion)
+            //{
+            //    //killers[depth].append(best_move)
+            //}
+        //}
+
+        if (intBestEval <= alpha_orig)  // failed low, upper bound
+        // {
+            EvalType = 2; // 2 = eNodeType.UpperBound
+        // }
+
+        if (alpha_orig < intBestEval && intBestEval < beta)  // exact, principle variation node
+        //{
+            EvalType = 0; // 0 = eNodeType.Exact)
+        //}
+
+        // if no entry or this depth is less or equal to existing
+        if (blnNewEntry || depth <= entry.depth)
+        //{
+            // Store best eval move for this position in the transposition table
+            //    entry.score = intBestEval;
+            //    entry.move = BestMove;
+            //    entry.nodeType = EvalType;
+            //    entry.depth = depth;
+            //    c_colTranspositionTable[zobrist_key] = entry;
+            c_colTranspositionTable[c_Board.ZobristKey] = new TranspositionEntry { score = intBestEval, move = BestMove, nodeType = EvalType, depth = depth };
+        
+        //}
+
+        return intBestEval;
+
+    }
+    #endregion
+
+    #region "quiescence_search"
+    /// <summary>
+    /// Quiescence search is the captures that can happen after the depth is reached, 
+    /// continuing for each sides captures to get a proper material evaluation
+    /// </summary>
+    /// <param name="alpha"></param>
+    /// <param name="beta"></param>
+    /// <param name="limit"></param>
+    /// <returns></returns>
+    private int QuiescenceSearch(int alpha, int beta, int limit)
+    {
+
+        int stand_pat = GetEval();
+
+        if (stand_pat >= beta)
+        //{
+            return beta;
+        //}
+
+        if (alpha < stand_pat)
+        //{
+            alpha = stand_pat;
+        //}
+
+        if (limit == 0)
+        //{
+            return stand_pat;
+        //}
+
+        Span<Move> moves = stackalloc Move[256];
+        GetOrderdEvaluatedLegalMoves(ref moves, true);
+        
+        foreach (Move move in moves)
+        {
+            //c_intCaptures++; // #DEBUG
+
+            c_Board.MakeMove(move);
+            int intEval = -QuiescenceSearch(-beta, -alpha, limit - 1);
+            c_Board.UndoMove(move);
+
+            // ---------------------------------------------------------------
+            // check time limit
+            // It is this QuiescenceSearch that usually takes the most time so use it to test this
+            // ---------------------------------------------------------------
+            //if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+            //    return 2000000; // Number bigger than eval allows
+
+
+            // alpha beta pruning
+            if (intEval >= beta)
+            //{
+                return beta;
+            //}
+
+            if (intEval > alpha)
+            //{
+                alpha = intEval;
+            //}
+        }
+
+        return alpha;
+
+    }
+    #endregion
+
+}
+                        
+                    </code> 
+                </pre>
+            </div>
+        </div>
+
+        <script src="wwwroot/javascript/site.js"></script>
+    </body>
+</html>
