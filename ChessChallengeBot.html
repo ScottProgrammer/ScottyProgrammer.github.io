@@ -41,7 +41,7 @@
                 Hi Sebastian, </br></br>
                 here is the full code for my bot, this one has all the debug code and code that didn't make the cut.</br>
                 No need to really look at it, but if you wanted to see more of what went in to making a bot for the challenge, this shows it way better than just the simple submission.</br>
-                this one will not make the token limit but is the same code as my submission just with debug code, the extra code that didn't make the cut is still commented out </br>
+                this one will still make the token limit with my debug code and test code commented out.</br>
                 Thanks again for such a fun challenge.
             </div>
             
@@ -160,15 +160,15 @@ internal class MyBot : IChessBot
     //int c_intMoveNumber = 0; // #DEBUG 
     //int c_intDepthReached = 0; // #DEBUG
 
-    /// <summary>
+    /// &lt;summary&gt;
     /// Best move found on this iteration
-    /// </summary>
+    /// &lt;/summary&gt;
     Move c_BestMove, // Best move in Search
             c_BestMoveThisIteration; // Best move found on this iteration (MinMax)
 
-    /// <summary>
+    /// &lt;summary&gt;
     /// Best eval for this iteration
-    /// </summary>
+    /// &lt;/summary&gt;
     int c_intBestEval,  // Best eval in Search
         c_intBestEvalThisIteration, // Best eval for this iteration (MinMax)
         c_intThisMoveTimeAllowed; // The time allowed to think for the current move  
@@ -208,7 +208,7 @@ internal class MyBot : IChessBot
     //}
 
     // transposition table to store the alpha beta values for each position
-    Dictionary<ulong, TranspositionEntry> c_colTranspositionTable = new();
+    Dictionary&lt;ulong, TranspositionEntry&gt; c_colTranspositionTable = new();
     #endregion 
 
     // Constructor
@@ -447,7 +447,7 @@ internal class MyBot : IChessBot
             ////c_intBestEvalThisIteration = -50000; // set to this in search moves and not used until then
 
             //// figure out best move order to start
-            //Span<Move> moves = stackalloc Move[256];
+            //Span&lt;Move&gt; moves = stackalloc Move[256];
             //GetOrderdEvaluatedLegalMoves(ref moves, false);
             //SearchMoves(4, moves);
 
@@ -466,7 +466,7 @@ internal class MyBot : IChessBot
 //            c_intMoveNumber++; // #DEBUG
 //            Debug.Print("before Eval: " + intBeforeEval);// #DEBUG
 
-//            int ttEntrySizeBytes = System.Runtime.InteropServices.Marshal.SizeOf<TranspositionEntry>();  // #DEBUG
+//            int ttEntrySizeBytes = System.Runtime.InteropServices.Marshal.SizeOf&lt;TranspositionEntry&gt;();  // #DEBUG
 
 //            string strDebug = (c_Board.IsWhiteToMove ? "White: " : "Black: ") + "Move: " + c_BestMove.StartSquare.Name + c_BestMove.TargetSquare.Name + // #DEBUG
 //                 "  Eval:(" + (c_intBestEval - intBeforeEval) + ") (b:" + intBeforeEval + " e:" + c_intBestEval + ")" + // #DEBUG
@@ -511,13 +511,13 @@ internal class MyBot : IChessBot
     }
 
 
-    //public int IsWhiteNum(bool IsWhite) =>
+    //public int IsWhiteNum(bool IsWhite) =&gt;
     //    IsWhite ? 1 : -1;
 
 
     #region "GetOrderdEvaluatedLegalMoves"
     //private Move[] GetOrderdEvaluatedLegalMoves(bool blnIsWhite, bool blnCapturesOnly)
-    private void GetOrderdEvaluatedLegalMoves(ref Span<Move> moves, bool blnCapturesOnly)
+    private void GetOrderdEvaluatedLegalMoves(ref Span&lt;Move&gt; moves, bool blnCapturesOnly)
     {
 
         //bool blnIsWhite = c_Board.IsWhiteToMove;
@@ -527,11 +527,11 @@ internal class MyBot : IChessBot
         //// Randomise the moves so don't get the same move all the time (especially at the beginning of the game)
         /// and helps stop repetition
         //Random rnd = new(DateTime.Now.Millisecond);
-        //moves = moves.OrderBy(x => rnd.Next()).ToArray();
+        //moves = moves.OrderBy(x =&gt; rnd.Next()).ToArray();
         
         // Sort moves to possible best moves first
-        moves.Sort((a, b) => AddWeightToMove(b, blnCapturesOnly) - AddWeightToMove(a, blnCapturesOnly));
-        //return moves.OrderByDescending(e => AddWeightToMove(e, c_Board.IsWhiteToMove, blnCapturesOnly)).ToList();
+        moves.Sort((a, b) =&gt; AddWeightToMove(b, blnCapturesOnly) - AddWeightToMove(a, blnCapturesOnly));
+        //return moves.OrderByDescending(e =&gt; AddWeightToMove(e, c_Board.IsWhiteToMove, blnCapturesOnly)).ToList();
 
         //return moves;
 
@@ -600,7 +600,7 @@ internal class MyBot : IChessBot
         //    {
         //        int kingDistanceBefore = ChebyshevDistance(move.StartSquare.Index, c_Board.GetKingSquare(!blnIsWhite).Index);
         //        int kingDistanceAfter = ChebyshevDistance(move.TargetSquare.Index, c_Board.GetKingSquare(!blnIsWhite).Index);
-        //        if (kingDistanceAfter < kingDistanceBefore)
+        //        if (kingDistanceAfter &lt; kingDistanceBefore)
         //        {
         //            intScore += 30;
         //        }
@@ -634,26 +634,26 @@ internal class MyBot : IChessBot
 
     int c_intPieceType_SquareWeightByPiece; // *** save tokens by setting this rather than passing it into SquareWeightByPiece
 
-    /// <summary>
+    /// &lt;summary&gt;
     /// Get the square weight of a square for a specific piece and color (shared by Order moves and eval)
-    /// </summary>
-    /// <param name="SquareIndex"></param>
-    /// <param name="PieceType">use pieceType - 1 eg(0=pawn, 1=knight)</param>
-    /// <param name="intIsWhite"></param>
-    /// <returns>Square weight value (same for black of white)</returns>
+    /// &lt;/summary&gt;
+    /// &lt;param name="SquareIndex"&gt;&lt;/param&gt;
+    /// &lt;param name="PieceType"&gt;use pieceType - 1 eg(0=pawn, 1=knight)&lt;/param&gt;
+    /// &lt;param name="intIsWhite"&gt;&lt;/param&gt;
+    /// &lt;returns&gt;Square weight value (same for black of white)&lt;/returns&gt;
     private int SquareWeightByPiece(int SquareIndex, bool blnIsWhite)
     {
 
         // *** save 2 tokens
         //if (intIsWhite == -1) SquareIndex = 63 - SquareIndex; // reverse bit board for black
-        //ulong bit = 1UL << SquareIndex; // same as Math.Pow 2 ^ index
-        //ulong bit = 1UL << (intIsWhite == 1 ? SquareIndex : 63 - SquareIndex);
-        ulong bit = 1UL << (blnIsWhite ? SquareIndex : 63 - SquareIndex);
+        //ulong bit = 1UL &lt;&lt; SquareIndex; // same as Math.Pow 2 ^ index
+        //ulong bit = 1UL &lt;&lt; (intIsWhite == 1 ? SquareIndex : 63 - SquareIndex);
+        ulong bit = 1UL &lt;&lt; (blnIsWhite ? SquareIndex : 63 - SquareIndex);
 
         // Loop through bitBoards for pieceType to get its weight value
         // Find which bit board the pieces in in to get the square weight value
         // *** save tokens use 1 array of bb, value, bb, value, etc rather then 2
-        for (int i = 0; i < c_PieceMoveWeights[c_intPieceType_SquareWeightByPiece].Length; i += 2)
+        for (int i = 0; i &lt; c_PieceMoveWeights[c_intPieceType_SquareWeightByPiece].Length; i += 2)
         {
             //ulong bb = c_PieceMoveWeights[PieceType][i];
             //if ((bb & bit) == bit)
@@ -737,7 +737,7 @@ internal class MyBot : IChessBot
         ////}
 
         //// discourage repetition (when more than once)
-        //if (c_Board.GameRepetitionHistory.Count(e => e == c_Board.ZobristKey) > 1)
+        //if (c_Board.GameRepetitionHistory.Count(e =&gt; e == c_Board.ZobristKey) &gt; 1)
         ////{
         //    intEval = 0;
         ////}
@@ -769,22 +769,22 @@ internal class MyBot : IChessBot
     //    // and they can still support each other or prevent enemy pawns from advancing
     //    ulong PawnBB = c_Board.GetPieceBitboard(PieceType.Pawn, IsWhite);
 
-    //    //ulong ShiftLeft = PawnBB << 1 & PawnBB; 
-    //    //ulong ShiftRight = PawnBB >> 1 & PawnBB; 
-    //    //ulong ShiftUp = PawnBB << 8 & PawnBB; 
-    //    //ulong ShiftDown = PawnBB >> 8 & PawnBB;
-    //    //ulong ShiftUpLeft = PawnBB << 9 & PawnBB;
-    //    //ulong ShiftUpRight = PawnBB << 7 & PawnBB;
-    //    //ulong ShiftDownLeft = PawnBB >> 7 & PawnBB;
-    //    //ulong ShiftDownRight = PawnBB >> 9 & PawnBB;
+    //    //ulong ShiftLeft = PawnBB &lt;&lt; 1 & PawnBB; 
+    //    //ulong ShiftRight = PawnBB &gt;&gt; 1 & PawnBB; 
+    //    //ulong ShiftUp = PawnBB &lt;&lt; 8 & PawnBB; 
+    //    //ulong ShiftDown = PawnBB &gt;&gt; 8 & PawnBB;
+    //    //ulong ShiftUpLeft = PawnBB &lt;&lt; 9 & PawnBB;
+    //    //ulong ShiftUpRight = PawnBB &lt;&lt; 7 & PawnBB;
+    //    //ulong ShiftDownLeft = PawnBB &gt;&gt; 7 & PawnBB;
+    //    //ulong ShiftDownRight = PawnBB &gt;&gt; 9 & PawnBB;
     //    //ulong ConnectedPawns = ShiftLeft | ShiftRight | ShiftUp | ShiftDown | ShiftUpLeft | ShiftUpRight | ShiftDownLeft | ShiftDownRight;
 
     //    // Same as above but less readable (saves tokens)
     //    // OR the Shifted pieces with the original pawnBB to get the squares that 
-    //    ulong ConnectedPawns = (PawnBB << 1 & PawnBB) | (PawnBB >> 1 & PawnBB) | // Shift Left and Right
-    //                           (PawnBB << 8 & PawnBB) | (PawnBB >> 8 & PawnBB) | // Shift Up and down
-    //                           (PawnBB << 9 & PawnBB) | (PawnBB << 7 & PawnBB) | // Shift Up Left and Up Right
-    //                           (PawnBB >> 7 & PawnBB) | (PawnBB >> 9 & PawnBB); // Shift Down Left and Down Right
+    //    ulong ConnectedPawns = (PawnBB &lt;&lt; 1 & PawnBB) | (PawnBB &gt;&gt; 1 & PawnBB) | // Shift Left and Right
+    //                           (PawnBB &lt;&lt; 8 & PawnBB) | (PawnBB &gt;&gt; 8 & PawnBB) | // Shift Up and down
+    //                           (PawnBB &lt;&lt; 9 & PawnBB) | (PawnBB &lt;&lt; 7 & PawnBB) | // Shift Up Left and Up Right
+    //                           (PawnBB &gt;&gt; 7 & PawnBB) | (PawnBB &gt;&gt; 9 & PawnBB); // Shift Down Left and Down Right
 
     //    //c_Board.GetPiece(new Square( ) 
     //    intEval += 10 * BitboardHelper.GetNumberOfSetBits(ConnectedPawns);
@@ -803,33 +803,33 @@ internal class MyBot : IChessBot
 
     //    // Can move forward (not blocked) 
     //    ulong canMoveForward = IsWhite ?
-    //                            (PawnBB << 8) & ~AllPieces :
-    //                            (PawnBB >> 8) & ~AllPieces;
+    //                            (PawnBB &lt;&lt; 8) & ~AllPieces :
+    //                            (PawnBB &gt;&gt; 8) & ~AllPieces;
     //    //ulong canMoveForward;
     //    //if (IsWhite)
-    //    //    //ulong ShiftUp = (PawnBB << 8);
+    //    //    //ulong ShiftUp = (PawnBB &lt;&lt; 8);
     //    //    //ulong canMoveForward = (ShiftUp & ~AllPieces); // RemoveOccupiedSquares
-    //    //    canMoveForward = (PawnBB << 8) & ~AllPieces;
+    //    //    canMoveForward = (PawnBB &lt;&lt; 8) & ~AllPieces;
     //    //else
-    //    //    //ulong ShiftDown = PawnBB >> 8;
+    //    //    //ulong ShiftDown = PawnBB &gt;&gt; 8;
     //    //    //ulong canMoveForward = (ShiftDown & ~AllPieces); // RemoveOccupiedSquares
-    //    //    canMoveForward = (PawnBB >> 8) & ~AllPieces;
+    //    //    canMoveForward = (PawnBB &gt;&gt; 8) & ~AllPieces;
     //    intEval += 5 * BitboardHelper.GetNumberOfSetBits(canMoveForward);
 
     //    // Can take
     //    ulong OpponentPieces = IsWhite ? c_Board.BlackPiecesBitboard : c_Board.WhitePiecesBitboard;
     //    ulong CapturePawns = IsWhite ?
-    //                          (PawnBB << 9 & OpponentPieces) | (PawnBB << 7 & OpponentPieces) :
-    //                          (PawnBB >> 7 & OpponentPieces) | (PawnBB >> 9 & OpponentPieces);
+    //                          (PawnBB &lt;&lt; 9 & OpponentPieces) | (PawnBB &lt;&lt; 7 & OpponentPieces) :
+    //                          (PawnBB &gt;&gt; 7 & OpponentPieces) | (PawnBB &gt;&gt; 9 & OpponentPieces);
     //    //ulong CapturePawns;
     //    //if (IsWhite)
-    //    //    //ulong ShiftUpLeft = PawnBB << 9;
-    //    //    //ulong ShiftUpRight = PawnBB << 7;
-    //    //    CapturePawns = (PawnBB << 9 & OpponentPieces)  | (PawnBB << 7 & OpponentPieces);
+    //    //    //ulong ShiftUpLeft = PawnBB &lt;&lt; 9;
+    //    //    //ulong ShiftUpRight = PawnBB &lt;&lt; 7;
+    //    //    CapturePawns = (PawnBB &lt;&lt; 9 & OpponentPieces)  | (PawnBB &lt;&lt; 7 & OpponentPieces);
     //    //else
-    //    //    //ulong ShiftDownLeft = PawnBB >> 7;
-    //    //    //ulong ShiftDownRight = PawnBB >> 9;
-    //    //    CapturePawns = (PawnBB >> 7 & OpponentPieces) | (PawnBB >> 9 & OpponentPieces);
+    //    //    //ulong ShiftDownLeft = PawnBB &gt;&gt; 7;
+    //    //    //ulong ShiftDownRight = PawnBB &gt;&gt; 9;
+    //    //    CapturePawns = (PawnBB &gt;&gt; 7 & OpponentPieces) | (PawnBB &gt;&gt; 9 & OpponentPieces);
 
     //    intEval += 6 * BitboardHelper.GetNumberOfSetBits(CapturePawns);
 
@@ -856,18 +856,18 @@ internal class MyBot : IChessBot
     //        // Passed pawns are very valuable because they can easily be promoted to queens.
 
     //        //  --- Use bit boards
-    //        //ulong SinglePawnBB = 1UL << myPawn.Square.Index;
+    //        //ulong SinglePawnBB = 1UL &lt;&lt; myPawn.Square.Index;
     //        //ulong PassedPawn;
     //        //if (IsWhite)
     //        //{
     //        //    // the square that is directly in front of the pawn
-    //        //    ulong ShiftUp = SinglePawnBB << 8;
+    //        //    ulong ShiftUp = SinglePawnBB &lt;&lt; 8;
     //        //    // the three squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB << 9) | (SinglePawnBB << 7);
+    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB &lt;&lt; 9) | (SinglePawnBB &lt;&lt; 7);
     //        //    // the six squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront << 16);
+    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront &lt;&lt; 16);
     //        //    // the twelve squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront << 32);
+    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront &lt;&lt; 32);
 
     //        //    // Bitwise AND the pawn mask with the black pawns bit board
     //        //    PassedPawn = TwelvwSquaresInFront & BlackPawns;
@@ -875,13 +875,13 @@ internal class MyBot : IChessBot
     //        //else
     //        //{
     //        //    // the square that is directly in front of the pawn
-    //        //    ulong ShiftUp = SinglePawnBB >> 8;
+    //        //    ulong ShiftUp = SinglePawnBB &gt;&gt; 8;
     //        //    // the three squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB >> 9) | (SinglePawnBB >> 7);
+    //        //    ulong ThreeSquaresInFront = ShiftUp | (SinglePawnBB &gt;&gt; 9) | (SinglePawnBB &gt;&gt; 7);
     //        //    // the six squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront >> 16);
+    //        //    ulong SixSquaresInFront = ThreeSquaresInFront | (ThreeSquaresInFront &gt;&gt; 16);
     //        //    // the twelve squares that are in front of the pawn on the same file or adjacent files
-    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront >> 32);
+    //        //    ulong TwelvwSquaresInFront = ThreeSquaresInFront | SixSquaresInFront | (SixSquaresInFront &gt;&gt; 32);
 
     //        //    // Bitwise AND the pawn mask with the black pawns bit board
     //        //    PassedPawn = TwelvwSquaresInFront & BlackPawns;
@@ -895,8 +895,8 @@ internal class MyBot : IChessBot
     //        {
     //            PieceList myBlackPawns = c_Board.GetPieceList(PieceType.Pawn, false);
     //            // Any black pawns in front, same file or left or right a file
-    //            if (!myBlackPawns.Any(p => p.Square.File > myPawn.Square.File - 1 && p.Square.File < myPawn.Square.File + 1 &&
-    //                                 p.Square.Rank > myPawn.Square.Rank))
+    //            if (!myBlackPawns.Any(p =&gt; p.Square.File &gt; myPawn.Square.File - 1 && p.Square.File &lt; myPawn.Square.File + 1 &&
+    //                                 p.Square.Rank &gt; myPawn.Square.Rank))
     //            {
     //                intEval += 8;
     //            }
@@ -905,8 +905,8 @@ internal class MyBot : IChessBot
     //        {
     //            PieceList myWhitePawns = c_Board.GetPieceList(PieceType.Pawn, true);
     //            // Any black pawns in front, same file or left or right a file
-    //            if (!myWhitePawns.Any(p => p.Square.File > myPawn.Square.File - 1 && p.Square.File < myPawn.Square.File + 1 &&
-    //                                 p.Square.Rank < myPawn.Square.Rank))
+    //            if (!myWhitePawns.Any(p =&gt; p.Square.File &gt; myPawn.Square.File - 1 && p.Square.File &lt; myPawn.Square.File + 1 &&
+    //                                 p.Square.Rank &lt; myPawn.Square.Rank))
     //            {
     //                intEval += 8;
     //            }
@@ -921,7 +921,7 @@ internal class MyBot : IChessBot
     //        // NOTE: save tokens (white will look forward for other pawns, while back will look back
     //        // as we are checking all pawns either way is valid so save tokens by using one bit of code
     //        // --- Use Linq
-    //        if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank > myPawn.Square.Rank))
+    //        if (p_PawnPieceList.Any(p =&gt; p.Square.File == myPawn.Square.File && p.Square.Rank &gt; myPawn.Square.Rank))
     //            intEval -= 2;
 
     //        //if (IsWhite)
@@ -929,10 +929,10 @@ internal class MyBot : IChessBot
     //        //  --- Use bit boards
     //        //  //Create a pawn mask for the current pawn
     //        //  // the square that is directly in front of the pawn
-    //        //  ulong ShiftDown = SinglePawnBB >> 8;
-    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB >> 16);
-    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind >> 16);
-    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind >> 16);
+    //        //  ulong ShiftDown = SinglePawnBB &gt;&gt; 8;
+    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB &gt;&gt; 16);
+    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind &gt;&gt; 16);
+    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind &gt;&gt; 16);
 
     //        //  ulong DoubledPawn = EightSquareBehind & WhitePawns;
 
@@ -942,7 +942,7 @@ internal class MyBot : IChessBot
     //        // NOTE: save tokens (white will look forward for other pawns, while back will look back
     //        // as we are checking all pawns either way is valid so save tokens by using one bit of code
     //        //  --- Use Linq
-    //        //  if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank > myPawn.Square.Rank))
+    //        //  if (p_PawnPieceList.Any(p =&gt; p.Square.File == myPawn.Square.File && p.Square.Rank &gt; myPawn.Square.Rank))
     //        //      intEval -= 2;
 
     //        //}
@@ -950,10 +950,10 @@ internal class MyBot : IChessBot
     //        //{
     //        //    --- Use bit boards
     //        //  // Create a pawn mask for the current pawn
-    //        //  ulong ShiftDown = SinglePawnBB << 8;
-    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB << 16);
-    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind << 16);
-    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind << 16);
+    //        //  ulong ShiftDown = SinglePawnBB &lt;&lt; 8;
+    //        //  ulong TwoSquaresBehind = ShiftDown | (SinglePawnBB &lt;&lt; 16);
+    //        //  ulong FourSquareBehind = TwoSquaresBehind | (TwoSquaresBehind &lt;&lt; 16);
+    //        //  ulong EightSquareBehind = FourSquareBehind | (FourSquareBehind &lt;&lt; 16);
 
     //        //  ulong DoubledPawn = EightSquareBehind & BlackPawns;
 
@@ -961,7 +961,7 @@ internal class MyBot : IChessBot
     //        //      intEval -= 2;
 
     //        // --- Use Linq
-    //        //  if (p_PawnPieceList.Any(p => p.Square.File == myPawn.Square.File && p.Square.Rank < myPawn.Square.Rank))
+    //        //  if (p_PawnPieceList.Any(p =&gt; p.Square.File == myPawn.Square.File && p.Square.Rank &lt; myPawn.Square.Rank))
     //        //      intEval -= 2;
     //        //}
     //    }
@@ -991,37 +991,37 @@ internal class MyBot : IChessBot
         //c_intBestEvalThisIteration = -50000; // set to this in search moves and not used until then
 
         // figure out best move order to start
-        Span<Move> moves = stackalloc Move[256];
+        Span&lt;Move&gt; moves = stackalloc Move[256];
         GetOrderdEvaluatedLegalMoves(ref moves, false);
         //var moves = GetOrderdEvaluatedLegalMoves(false);
 
         #region "' End game check"
         // Go in to end game mode (used to return material score from getEval)
-        //if (intMaterialScore < 9600 && c_blnInEndGame == false)
+        //if (intMaterialScore &lt; 9600 && c_blnInEndGame == false)
         //{
         //    // Change to king end game Weights
         //    c_PieceMoveWeights[5] = c_PieceMoveWeights[6];
         //    c_blnInEndGame = true;
 
         //   // Change piece weight tables
-        //    for (int j = 1; j < 18; j += 2)
+        //    for (int j = 1; j &lt; 18; j += 2)
         //    {
         //        // Encourage pawns to move up
         //        c_PieceMoveWeights[0][j] += 30UL + (ulong)j;
 
         //        // Other pieces should value moves not square positions any more
         //        c_PieceMoveWeights[1][j] = 0UL;
-        //        if (j < 10) c_PieceMoveWeights[2][j] = 0UL;
-        //        if (j < 8) c_PieceMoveWeights[3][j] = 0UL;
-        //        if (j < 10) c_PieceMoveWeights[4][j] = 0UL;
+        //        if (j &lt; 10) c_PieceMoveWeights[2][j] = 0UL;
+        //        if (j &lt; 8) c_PieceMoveWeights[3][j] = 0UL;
+        //        if (j &lt; 10) c_PieceMoveWeights[4][j] = 0UL;
         //    }
         //}
         #endregion 
 
-        for (int depth = 1; depth <= 25; depth++) // 25 was maxDepth passed in but need to save tokens (never gets close to that depth, but who knows on a different computer)
+        for (int depth = 1; depth &lt;= 25; depth++) // 25 was maxDepth passed in but need to save tokens (never gets close to that depth, but who knows on a different computer)
         {
             
-            if (depth > 1)
+            if (depth &gt; 1)
             {
                 // -----------------------------------------------------------------
                 // put best move found during last depth first at next depth
@@ -1048,7 +1048,7 @@ internal class MyBot : IChessBot
                 // if (SearchMoves = true) time limit was exceeded or checkmate detected, go with best move.
                 // checkmate: has already set c_BestBove
                 // timeout: check if current best move before exiting early is better than last depths best move
-                if (c_intBestEvalThisIteration > c_intBestEval)
+                if (c_intBestEvalThisIteration &gt; c_intBestEval)
                 //{
                     c_BestMove = c_BestMoveThisIteration;
                 //}
@@ -1080,13 +1080,13 @@ internal class MyBot : IChessBot
     #endregion
 
     #region "Search Moves"
-    /// <summary>
+    /// &lt;summary&gt;
     /// Start searching moves at using the current depth
-    /// </summary>
-    /// <param name="intCurrentDepth"></param>
-    /// <param name="moves"></param>
-    /// <returns></returns>
-    private bool SearchMoves(int intCurrentDepth, ReadOnlySpan<Move> moves) 
+    /// &lt;/summary&gt;
+    /// &lt;param name="intCurrentDepth"&gt;&lt;/param&gt;
+    /// &lt;param name="moves"&gt;&lt;/param&gt;
+    /// &lt;returns&gt;&lt;/returns&gt;
+    private bool SearchMoves(int intCurrentDepth, ReadOnlySpan&lt;Move&gt; moves) 
     {
 
         int alpha = -50000,
@@ -1161,7 +1161,7 @@ internal class MyBot : IChessBot
                 //} // #DEBUG
             //} // #DEBUG
 
-            if (intEval > c_intBestEvalThisIteration)
+            if (intEval &gt; c_intBestEvalThisIteration)
             {
                 c_intBestEvalThisIteration = intEval;
                 c_BestMoveThisIteration = move;
@@ -1175,7 +1175,7 @@ internal class MyBot : IChessBot
             ////// check time limit
             ////// ---------------------------------------------------------------
             //////// there is usually always some very quick moves later in the game 
-            ////if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+            ////if (c_Timer.MillisecondsElapsedThisTurn &gt; c_intThisMoveTimeAllowed)
             ////{ // #DEBUG
             ////    Debug.Print("*** Time Limit exceeded return current best move *** limit:(" + c_Timer.MillisecondsElapsedThisTurn + ":" + c_intThisMoveTimeAllowed + ")   best move:" + c_BestMoveThisIteration);  // #DEBUG
             ////    return true; // true = time limit reached (stop iterative deepening code doing next depth)
@@ -1278,13 +1278,13 @@ internal class MyBot : IChessBot
     #endregion 
 
     #region "MinMax with alpha beta pruning"
-    /// <summary>
+    /// &lt;summary&gt;
     /// This is the main search the one that checks every possible move
-    /// </summary>
-    /// <param name="alpha"></param>
-    /// <param name="beta"></param>
-    /// <param name="depth"></param>
-    /// <returns></returns>
+    /// &lt;/summary&gt;
+    /// &lt;param name="alpha"&gt;&lt;/param&gt;
+    /// &lt;param name="beta"&gt;&lt;/param&gt;
+    /// &lt;param name="depth"&gt;&lt;/param&gt;
+    /// &lt;returns&gt;&lt;/returns&gt;
     private int MinMax(int alpha, int beta, int depth) //, ulong zobrist_key)
     {
 
@@ -1298,7 +1298,7 @@ internal class MyBot : IChessBot
         if (c_colTranspositionTable.TryGetValue(c_Board.ZobristKey, out TranspositionEntry entry))
         {
             blnNewEntry = false;
-            if (entry.depth >= depth)
+            if (entry.depth &gt;= depth)
             {
                 //// **** Save 1 token
                 //If the entry has a lower bound greater than or equal to beta, return it
@@ -1309,10 +1309,10 @@ internal class MyBot : IChessBot
                 if (nodetype == 0) // 0 = eNodeType.Exact)
                     return score;
 
-                if (nodetype == 2 && score <= alpha) // 2 = eNodeType.UpperBound
+                if (nodetype == 2 && score &lt;= alpha) // 2 = eNodeType.UpperBound
                     return alpha;
 
-                if (nodetype == 1 && score >= beta) // 1 = eNodeType.LowerBound
+                if (nodetype == 1 && score &gt;= beta) // 1 = eNodeType.LowerBound
                     return beta;
 
             }
@@ -1340,7 +1340,7 @@ internal class MyBot : IChessBot
         //        return 5000;
         //}
 
-        Span<Move> moves = stackalloc Move[256];
+        Span&lt;Move&gt; moves = stackalloc Move[256];
         GetOrderdEvaluatedLegalMoves(ref moves, false);
         
         Move BestMove = Move.NullMove;
@@ -1360,30 +1360,30 @@ internal class MyBot : IChessBot
             //if (intEval == -2000000) return 2000000; // used if added to QuiescenceSearch (removed to save tokens)
             //if (c_blnIterativeDeepening == true) // #DEBUG
             //{ // #DEBUG
-                if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+                if (c_Timer.MillisecondsElapsedThisTurn &gt; c_intThisMoveTimeAllowed)
                     return 2000000; // Number bigger than eval allows
             //} // #DEBUG
 
             // Store move if better than best move 
-            if (intEval > intBestEval)
+            if (intEval &gt; intBestEval)
             {
                 intBestEval = intEval;
                 BestMove = move;
             }
 
             // alpha beta pruning
-            if (intEval > alpha)
+            if (intEval &gt; alpha)
             {
                 alpha = intEval;
                 
-                if (alpha >= beta)
+                if (alpha &gt;= beta)
                 //{
                     break;
                 //}
             }
 
 
-            //if (alpha >= beta)
+            //if (alpha &gt;= beta)
             //{
             //    entry.score = intBestEval;
             //    entry.depth = depth;
@@ -1395,11 +1395,11 @@ internal class MyBot : IChessBot
 
         }
 
-        if (intBestEval >= beta) // failed high, lower bound
+        if (intBestEval &gt;= beta) // failed high, lower bound
         //{
             EvalType = 1; // 1 = eNodeType.LowerBound 
             // killers = non-captures that are beta-cutoffs
-            //if (intBestEval > beta
+            //if (intBestEval &gt; beta
             //        and not board.is_capture(best_move)
             //        and best_move is not NULL_MOVE
             //        and not best_move.promotion)
@@ -1408,18 +1408,18 @@ internal class MyBot : IChessBot
             //}
         //}
 
-        if (intBestEval <= alpha_orig)  // failed low, upper bound
+        if (intBestEval &lt;= alpha_orig)  // failed low, upper bound
         // {
             EvalType = 2; // 2 = eNodeType.UpperBound
         // }
 
-        if (alpha_orig < intBestEval && intBestEval < beta)  // exact, principle variation node
+        if (alpha_orig &lt; intBestEval && intBestEval &lt; beta)  // exact, principle variation node
         //{
             EvalType = 0; // 0 = eNodeType.Exact)
         //}
 
         // if no entry or this depth is less or equal to existing
-        if (blnNewEntry || depth <= entry.depth)
+        if (blnNewEntry || depth &lt;= entry.depth)
         //{
             // Store best eval move for this position in the transposition table
             //    entry.score = intBestEval;
@@ -1437,25 +1437,25 @@ internal class MyBot : IChessBot
     #endregion
 
     #region "quiescence_search"
-    /// <summary>
+    /// &lt;summary&gt;
     /// Quiescence search is the captures that can happen after the depth is reached, 
     /// continuing for each sides captures to get a proper material evaluation
-    /// </summary>
-    /// <param name="alpha"></param>
-    /// <param name="beta"></param>
-    /// <param name="limit"></param>
-    /// <returns></returns>
+    /// &lt;/summary&gt;
+    /// &lt;param name="alpha"&gt;&lt;/param&gt;
+    /// &lt;param name="beta"&gt;&lt;/param&gt;
+    /// &lt;param name="limit"&gt;&lt;/param&gt;
+    /// &lt;returns&gt;&lt;/returns&gt;
     private int QuiescenceSearch(int alpha, int beta, int limit)
     {
 
         int stand_pat = GetEval();
 
-        if (stand_pat >= beta)
+        if (stand_pat &gt;= beta)
         //{
             return beta;
         //}
 
-        if (alpha < stand_pat)
+        if (alpha &lt; stand_pat)
         //{
             alpha = stand_pat;
         //}
@@ -1465,7 +1465,7 @@ internal class MyBot : IChessBot
             return stand_pat;
         //}
 
-        Span<Move> moves = stackalloc Move[256];
+        Span&lt;Move&gt; moves = stackalloc Move[256];
         GetOrderdEvaluatedLegalMoves(ref moves, true);
         
         foreach (Move move in moves)
@@ -1480,17 +1480,17 @@ internal class MyBot : IChessBot
             // check time limit
             // It is this QuiescenceSearch that usually takes the most time so use it to test this
             // ---------------------------------------------------------------
-            //if (c_Timer.MillisecondsElapsedThisTurn > c_intThisMoveTimeAllowed)
+            //if (c_Timer.MillisecondsElapsedThisTurn &gt; c_intThisMoveTimeAllowed)
             //    return 2000000; // Number bigger than eval allows
 
 
             // alpha beta pruning
-            if (intEval >= beta)
+            if (intEval &gt;= beta)
             //{
                 return beta;
             //}
 
-            if (intEval > alpha)
+            if (intEval &gt; alpha)
             //{
                 alpha = intEval;
             //}
